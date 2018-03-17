@@ -1,0 +1,11 @@
+.list-cell {
+    -fx-background-color: rgb(245, 245, 245)
+}
+
+.time-entry-list-cell {
+    -fx-background-color: white;
+}
+
+.time-entry-list-cell:selected {
+    -fx-background-color: #039be5;
+}
