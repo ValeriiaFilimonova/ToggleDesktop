@@ -2,6 +2,7 @@ package ui;
 
 import java.io.InputStream;
 
+import api.Color;
 import api.Company;
 import api.Project;
 import api.TimeEntry;
@@ -75,18 +76,11 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
         }
 
         Label projectLabel = new Label(labelText);
-        projectLabel.getStyleClass().add("time-entry-project");
+        projectLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + Color.getColorRgb(project.getColorId()));
 
         GridPane.setHgrow(projectLabel, Priority.ALWAYS);
 
         return projectLabel;
-    }
-
-    private Node getCompanyNode(TimeEntry item) {
-        Label companyLabel = new Label(item.getProject().getCompany().getName() + " •");
-        companyLabel.getStyleClass().add("time-entry-company");
-        GridPane.setMargin(companyLabel, new Insets(0, 5, 0, 0));
-        return companyLabel;
     }
 
     private Node getTagsCountNode(TimeEntry item) {
@@ -106,7 +100,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
         int duration = item.getDurationInMinutes();
         int hours = duration / 60;
         int minutes = duration - hours * 60;
-        String labelText = String.format("%dh %dmin", hours, minutes);
+        String labelText = String.format("%dh %02dmin", hours, minutes);
 
         Label durationLabel = new Label(labelText);
         durationLabel.getStyleClass().add("time-entry-duration");

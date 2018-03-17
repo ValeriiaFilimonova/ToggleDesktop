@@ -19,14 +19,6 @@
     -fx-font-size: 14px;
 }
 
-.time-entry-project {
-    -fx-font-size: 11px;
-}
-
-.time-entry-company {
-    -fx-font-size: 11px;
-}
-
 .time-entry-duration {
     -fx-text-fill: lightslategray;
     -fx-font-size: 16px;

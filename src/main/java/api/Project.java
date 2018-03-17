@@ -14,6 +14,9 @@ public class Project {
     @Setter
     private String cid;
 
+    @Setter
+    private String color;
+
     @NonNull
     @Getter @Setter
     private String name;
@@ -21,6 +24,10 @@ public class Project {
     @Data
     public static class ProjectData {
         private Project data;
+    }
+
+    public String getColorId() {
+        return color;
     }
 
     public Company getCompany() {

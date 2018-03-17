@@ -18,9 +18,9 @@ import org.apache.commons.lang3.time.DateUtils;
 public class DaysListComponent implements IComponent {
     private static String LABEL_DATE_FORMAT = "EEE, d MMM";
 
-    private JFXListView<JFXListView> list = new JFXListView<>();
+    private JFXListView<JFXListView<TimeEntry>> list = new JFXListView<>();
 
-    public JFXListView getComponent() {
+    public JFXListView<JFXListView<TimeEntry>> getComponent() {
         return this.list;
     }
 
@@ -30,7 +30,7 @@ public class DaysListComponent implements IComponent {
             .collect(Collectors.toCollection(ArrayDeque::new))
             .descendingIterator()
             .forEachRemaining((entry) -> {
-                Optional<JFXListView> subListOptional = this.list.getItems().stream()
+                Optional<JFXListView<TimeEntry>> subListOptional = this.list.getItems().stream()
                     .filter((subList) -> subList.getId().equals(entry.getDate()))
                     .findFirst();
 
@@ -43,6 +43,7 @@ public class DaysListComponent implements IComponent {
                     this.list.getItems().add(subList);
                 }
             });
+        this.list.refresh();
     }
 
     private JFXListView<TimeEntry> createSubList(String date) {
@@ -67,6 +68,7 @@ public class DaysListComponent implements IComponent {
             labelText = "Yesterday";
         }
 
+        // TODO ass sum duration to lable
         Label label = new Label(labelText);
         label.setTextAlignment(TextAlignment.LEFT);
         label.setAlignment(Pos.CENTER_LEFT);

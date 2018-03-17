@@ -48,7 +48,7 @@ public class ToggleClient {
         return projectData.getData();
     }
 
-    public List<TimeEntry> getPreviousTimeEntries(Date endDate, int count) {
+    public List<TimeEntry> getTimeEntriesBeforeDate(Date endDate, int count) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(endDate);
         calendar.add(Calendar.DATE, -count);
