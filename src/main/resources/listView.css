@@ -1,3 +1,8 @@
+.sub-list-label {
+    -fx-text-fill: rgb(77, 77, 77);
+    -fx-font-weight: bold;
+}
+
 .list-cell {
     -fx-background-color: rgb(245, 245, 245)
 }
@@ -8,4 +13,21 @@
 
 .time-entry-list-cell:selected {
     -fx-background-color: #039be5;
+}
+
+.time-entry-description {
+    -fx-font-size: 14px;
+}
+
+.time-entry-project {
+    -fx-font-size: 11px;
+}
+
+.time-entry-company {
+    -fx-font-size: 11px;
+}
+
+.time-entry-duration {
+    -fx-text-fill: lightslategray;
+    -fx-font-size: 16px;
 }

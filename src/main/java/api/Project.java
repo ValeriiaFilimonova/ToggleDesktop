@@ -1,7 +1,11 @@
+package api;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.*;
 
 @RequiredArgsConstructor
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Project {
     @NonNull
     @Getter @Setter
@@ -20,7 +24,9 @@ public class Project {
     }
 
     public Company getCompany() {
-        Company company = new Company("company name"); // TODO use company cache
-        return company;
+        if (cid == null) {
+            return null;
+        }
+        return Cache.getInstance().getCompany(cid);
     }
 }

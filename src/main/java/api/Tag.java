@@ -1,3 +1,7 @@
+package api;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,6 +13,7 @@ public enum Tag {
     ADMINISTRATION,
     TESTING;
 
+    @JsonValue
     public String toValue() {
         return StringUtils
             .capitalize(super.toString().toLowerCase())
