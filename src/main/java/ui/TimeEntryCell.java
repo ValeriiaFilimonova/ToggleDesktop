@@ -38,9 +38,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
             container.add(getDescriptionNode(item), 0, 0);
         }
 
-        if (item.getProject() != null) {
-            container.add(getProjectNode(item), 0, 1);
-        }
+        container.add(getProjectNode(item), 0, 1);
 
         if (item.getTags() != null) {
             container.add(getTagsCountNode(item), 1, 0, 1, 2);
@@ -67,16 +65,24 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
     }
 
     private Node getProjectNode(TimeEntry item) {
+        Label projectLabel = new Label();
+        String labelText = "";
+        String color = "white";
         Project project = item.getProject();
-        String labelText = project.getName();
-        Company company = project.getCompany();
 
-        if (company != null) {
-            labelText = company.getName() + " • " + labelText;
+        if (project != null) {
+            labelText = project.getName();
+            Company company = project.getCompany();
+
+            if (company != null) {
+                labelText = company.getName() + " • " + labelText;
+            }
+
+            color = Color.getColorRgb(project.getColorId());
         }
 
-        Label projectLabel = new Label(labelText);
-        projectLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + Color.getColorRgb(project.getColorId()));
+        projectLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: " + color);
+        projectLabel.setText(labelText);
 
         GridPane.setHgrow(projectLabel, Priority.ALWAYS);
 

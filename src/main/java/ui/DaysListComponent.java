@@ -8,12 +8,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import api.TimeEntry;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class DaysListComponent implements IComponent {
     private JFXListView<EntriesListComponent> list = new JFXListView<>();
+    private ObservableList<EntriesListComponent> items = FXCollections.observableArrayList();
 
     public DaysListComponent() {
+        list.setItems(items);
         list.setCellFactory(new DayCell.DayCellFactory());
     }
 
@@ -34,10 +37,9 @@ public class DaysListComponent implements IComponent {
                 if (subListOptional.isPresent()) {
                     subListOptional.get().addEntry(entry);
                 } else {
-                    this.list.getItems().add(new EntriesListComponent(entry));
+                    items.add(new EntriesListComponent(entry));
                 }
             });
-        this.list.refresh();
     }
 
     public String getEarliestDate() {

@@ -13,6 +13,8 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
             super.updateItem(entriesList, true);
         } else {
             entriesList.updateLabelText();
+            entriesList.setPrefHeight(40.5 * entriesList.getItems().size()); // TODO get rif of magic number
+
             super.updateItem(entriesList, empty);
         }
     }
