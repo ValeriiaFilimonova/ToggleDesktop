@@ -38,10 +38,6 @@ public class TimeEntry {
     @Getter @Setter
     private int duration;
 
-    public int getDurationInMinutes() {
-        return duration / 60;
-    }
-
     public Project getProject() {
         if (pid == null) {
             return null;
@@ -51,5 +47,12 @@ public class TimeEntry {
 
     public String getDate() {
         return new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).format(start);
+    }
+
+    public static String formatDuration(int durationInSeconds) {
+        int durationInMinutes = durationInSeconds / 60;
+        int hours = durationInMinutes / 60;
+        int minutes = durationInMinutes - hours * 60;
+        return String.format("%dh %02dmin", hours, minutes);
     }
 }

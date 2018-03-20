@@ -97,11 +97,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
     }
 
     private Node getDurationNode(TimeEntry item) {
-        int duration = item.getDurationInMinutes();
-        int hours = duration / 60;
-        int minutes = duration - hours * 60;
-        String labelText = String.format("%dh %02dmin", hours, minutes);
-
+        String labelText = TimeEntry.formatDuration(item.getDuration());
         Label durationLabel = new Label(labelText);
         durationLabel.getStyleClass().add("time-entry-duration");
 

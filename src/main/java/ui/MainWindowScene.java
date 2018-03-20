@@ -39,12 +39,7 @@ public class MainWindowScene {
 
         // TODO style the button
         showMoreButton.setVisible(false);
-        showMoreButton.setOnAction((event) -> {
-            // TODO move this logic to DaysListComponent
-            ObservableList<JFXListView<TimeEntry>> items = daysListComponent.getComponent().getItems();
-            JFXListView<TimeEntry> lastSubList = items.get(items.size() - 1);
-            this.getMoreEntries(lastSubList.getId());
-        });
+        showMoreButton.setOnAction((event) -> this.getMoreEntries(daysListComponent.getEarliestDate()));
         mainContainer.add(showMoreButton, 0, 2);
         GridPane.setVgrow(showMoreButton, Priority.NEVER);
         GridPane.setHalignment(showMoreButton, HPos.CENTER);
