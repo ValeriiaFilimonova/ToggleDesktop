@@ -59,6 +59,21 @@
     -fx-background-color: white;
 }
 
+.running-entry-container {
+    -fx-background-color: rgb(45, 43, 44);
+}
+
+.description-text-input {
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: lightgray;
+}
+
+.start-stop-button {
+    -fx-text-fill: white;
+    -fx-background-color: rgb(77, 217, 101);
+    -fx-background-radius: 0em;
+}
+
 .days-list {
     -fx-effect: none;
     -fx-background-color: transparent;

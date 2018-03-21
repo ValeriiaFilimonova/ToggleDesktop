@@ -28,6 +28,7 @@ public class MainWindowScene {
     private JFXButton showMoreButton = new JFXButton("Show more");
 
     public MainWindowScene() {
+        runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
         GridPane runningTimeEntry = runningTimeEntryComponent.getComponent();
         GridPane.setVgrow(runningTimeEntry, Priority.NEVER);
         GridPane.setHgrow(runningTimeEntry, Priority.ALWAYS);

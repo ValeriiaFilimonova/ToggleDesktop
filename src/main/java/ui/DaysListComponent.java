@@ -25,28 +25,39 @@ public class DaysListComponent implements IComponent {
         return this.list;
     }
 
+    public void addItem(TimeEntry timeEntry) {
+        addEntryToSubList(timeEntry);
+    }
+
     public void addItems(List<TimeEntry> timeEntries) {
         timeEntries
             .stream()
             .filter((e) -> e.getDuration() >= 0)
             .collect(Collectors.toCollection(ArrayDeque::new))
             .descendingIterator()
-            .forEachRemaining((entry) -> {
-                Optional<EntriesListComponent> subListOptional = this.list.getItems().stream()
-                    .filter((subList) -> subList.getId().equals(entry.getDate()))
-                    .findFirst();
-
-                if (subListOptional.isPresent()) {
-                    subListOptional.get().addEntry(entry);
-                } else {
-                    items.add(new EntriesListComponent(entry));
-                }
-            });
+            .forEachRemaining(this::addEntryToSubList);
     }
 
     public String getEarliestDate() {
         ObservableList<EntriesListComponent> items = list.getItems();
         EntriesListComponent lastSubList = items.get(items.size() - 1);
         return lastSubList.getId();
+    }
+
+    private void addEntryToSubList(TimeEntry timeEntry) {
+        Optional<EntriesListComponent> subListOptional = this.list.getItems().stream()
+            .filter((subList) -> subList.getId().equals(timeEntry.getDate()))
+            .findFirst();
+
+        if (subListOptional.isPresent()) {
+            subListOptional.get().addEntry(timeEntry);
+        } else {
+            // TODO temp
+            if (timeEntry.todaysEntry()) {
+                items.add(0, new EntriesListComponent(timeEntry));
+            } else {
+                items.add(new EntriesListComponent(timeEntry));
+            }
+        }
     }
 }

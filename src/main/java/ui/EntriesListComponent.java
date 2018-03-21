@@ -47,7 +47,12 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
 
     public void addEntry(TimeEntry entry) {
         sumDuration += entry.getDuration();
-        items.add(entry);
+        // TODO temp
+        if (entry.todaysEntry()) {
+            items.add(0, entry);
+        } else {
+            items.add(entry);
+        }
     }
 
     public void updateLabelText() {

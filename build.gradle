@@ -24,6 +24,7 @@ dependencies {
 
     compile 'com.jfoenix:jfoenix:8.0.1'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
+    compile group: 'joda-time', name: 'joda-time', version: '2.3'
     compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.19.4'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.5'
     compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.9.0'

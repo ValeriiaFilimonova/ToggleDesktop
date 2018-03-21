@@ -1,27 +1,35 @@
 package api;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import lombok.*;
+import org.apache.commons.lang3.time.DateUtils;
+import org.joda.time.Interval;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeEntry {
     public final static String SHORT_DATE_FORMAT = "yyyy-MM-dd";
 
     @Getter @Setter
-    private int id;
+    private String id;
 
     @Setter
     private String pid;
 
-    @Getter
+    @Setter
     private String description;
 
     @Getter @Setter
@@ -38,6 +46,9 @@ public class TimeEntry {
     @Getter @Setter
     private int duration;
 
+    @Getter @Setter
+    private String created_with;
+
     public String getDescription() {
         if (description == null) {
             return "";
@@ -45,6 +56,7 @@ public class TimeEntry {
         return description;
     }
 
+    @JsonIgnore
     public Project getProject() {
         if (pid == null) {
             return null;
@@ -52,14 +64,25 @@ public class TimeEntry {
         return Cache.getInstance().getProject(pid);
     }
 
+    @JsonIgnore
     public String getDate() {
         return new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).format(start);
     }
 
+    @JsonIgnore
+    public boolean todaysEntry() {
+        return DateUtils.isSameDay(start, Calendar.getInstance().getTime());
+    }
+
     public static String formatDuration(int durationInSeconds) {
-        int durationInMinutes = durationInSeconds / 60;
+        int durationInMinutes = durationInSeconds / 60; // TODO use Joda
         int hours = durationInMinutes / 60;
         int minutes = durationInMinutes - hours * 60;
         return String.format("%dh %02dmin", hours, minutes);
+    }
+
+    @Data
+    public static class TimeEntryResponseData {
+        private TimeEntry data;
     }
 }

@@ -1,5 +1,6 @@
 package api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -11,11 +12,11 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.MediaType;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 
 @RequiredArgsConstructor
 public class ToggleClient {
@@ -29,6 +30,8 @@ public class ToggleClient {
     private final static String COMPANIES_PATH = "clients/";
 
     private SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @NonNull
     private Client jerseyClient;
@@ -46,6 +49,38 @@ public class ToggleClient {
         ClientResponse response = performGetRequest(resource);
         Project.ProjectData projectData = response.getEntity(Project.ProjectData.class);
         return projectData.getData();
+    }
+
+    @SneakyThrows
+    public TimeEntry startTimeEntry() {
+        TimeEntryRequestData requestBody = TimeEntryRequestData.getStartRequest();
+        WebResource resource = jerseyClient.resource(API_URL + TIME_ENTRIES_PATH + "/start");
+        ClientResponse response = resource
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .type(MediaType.APPLICATION_JSON_TYPE)
+            .post(ClientResponse.class, objectMapper.writeValueAsString(requestBody));
+
+        // TODO move to method
+        if (response.getStatus() != 200) {
+            String errorMessage = response.getEntity(String.class);
+            throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
+        }
+        return response.getEntity(TimeEntry.TimeEntryResponseData.class).getData();
+    }
+
+    @SneakyThrows
+    public TimeEntry updateTimeEntry(TimeEntry entry) {
+        TimeEntryRequestData requestBody = new TimeEntryRequestData(entry);
+        WebResource resource = jerseyClient.resource(API_URL + TIME_ENTRIES_PATH + "/" + entry.getId());
+        ClientResponse response = resource
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .put(ClientResponse.class, objectMapper.writeValueAsString(requestBody));
+
+        if (response.getStatus() != 200) {
+            String errorMessage = response.getEntity(String.class);
+            throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
+        }
+        return response.getEntity(TimeEntry.TimeEntryResponseData.class).getData();
     }
 
     public List<TimeEntry> getTimeEntriesBeforeDate(Date endDate, int count) {
@@ -83,9 +118,8 @@ public class ToggleClient {
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
         if (response.getStatus() != 200) {
-            throw new BadRequestException(
-                String.format("Status %d: %s", response.getStatus(), response.getStatusInfo().getReasonPhrase())
-            );
+            String errorMessage = response.getEntity(String.class);
+            throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
         }
 
         return response;
