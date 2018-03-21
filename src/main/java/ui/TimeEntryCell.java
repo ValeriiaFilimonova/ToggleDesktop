@@ -34,10 +34,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
     private Node getItemGraphics(TimeEntry item) {
         GridPane container = new GridPane();
 
-        if (item.getDescription() != null) {
-            container.add(getDescriptionNode(item), 0, 0);
-        }
-
+        container.add(getDescriptionNode(item), 0, 0);
         container.add(getProjectNode(item), 0, 1);
 
         if (item.getTags() != null) {
@@ -45,6 +42,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
         }
 
         container.add(getDurationNode(item), 2, 0, 1, 2);
+        container.setPadding(new Insets(0, 0, 0, 10));
 
         return container;
     }
@@ -95,9 +93,10 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
 
         String tagsCount = Integer.toString(item.getTags().length);
         Label tagsCountLabel = new Label(tagsCount, new ImageView(image));
+        tagsCountLabel.getStyleClass().add("time-entry-tags-count");
 
         GridPane.setHgrow(tagsCountLabel, Priority.NEVER);
-        GridPane.setMargin(tagsCountLabel, new Insets(0, 10, 0, 10));
+        GridPane.setMargin(tagsCountLabel, new Insets(0, 15, 0, 10));
 
         return tagsCountLabel;
     }

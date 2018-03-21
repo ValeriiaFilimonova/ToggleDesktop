@@ -21,7 +21,7 @@ public class TimeEntry {
     @Setter
     private String pid;
 
-    @Getter @Setter
+    @Getter
     private String description;
 
     @Getter @Setter
@@ -37,6 +37,13 @@ public class TimeEntry {
 
     @Getter @Setter
     private int duration;
+
+    public String getDescription() {
+        if (description == null) {
+            return "";
+        }
+        return description;
+    }
 
     public Project getProject() {
         if (pid == null) {

@@ -9,8 +9,10 @@ import java.util.Date;
 import api.TimeEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.DateUtils;
@@ -18,7 +20,7 @@ import org.apache.commons.lang3.time.DateUtils;
 public class EntriesListComponent extends JFXListView<TimeEntry> {
     private static String LABEL_DATE_FORMAT = "EEE, d MMM";
 
-    private Label label = new Label();
+    private Label durationLabel = new Label("");
     private ObservableList<TimeEntry> items = FXCollections.observableArrayList();
     private Date date;
     private int sumDuration = 0;
@@ -26,14 +28,16 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
     @SneakyThrows
     public EntriesListComponent(String dateString) {
         date = new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString);
-        label.getStyleClass().add("sub-list-label");
+
+        HBox groupNode = getGroupNode();
 
         setId(dateString);
         setItems(items);
-        setGroupnode(label);
+        setGroupnode(groupNode);
+        getStyleClass().add("entries-list");
         setCellFactory(new TimeEntryCell.TimeEntryCellFactory());
 
-        StackPane.setAlignment(label, Pos.CENTER_LEFT);
+        StackPane.setAlignment(groupNode, Pos.CENTER_LEFT);
     }
 
     public EntriesListComponent(TimeEntry entry) {
@@ -47,8 +51,19 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
     }
 
     public void updateLabelText() {
-        String labelText = getDateText() + " " + TimeEntry.formatDuration(sumDuration);
-        label.setText(labelText);
+        durationLabel.setText(TimeEntry.formatDuration(sumDuration));
+    }
+
+    private HBox getGroupNode() {
+        Label dayLabel = new Label(getDateText());
+        dayLabel.getStyleClass().add("entries-list-header-day");
+        dayLabel.setPadding(new Insets(0, 10, 0, 10));
+
+        durationLabel.getStyleClass().add("entries-list-header-duration");
+
+        HBox container = new HBox(dayLabel, durationLabel);
+        container.getStyleClass().add("entries-list-header");
+        return container;
     }
 
     @SneakyThrows

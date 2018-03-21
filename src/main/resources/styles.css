@@ -1,20 +1,4 @@
-.sublist-header {
-    -fx-effect: dropshadow(gaussian, orange, 10, 1.0, 100, 100);
-}
-
-.sub-list-label {
-    -fx-text-fill: rgb(77, 77, 77);
-    -fx-font-weight: bold;
-    -fx-padding: 0px 10px;
-}
-
-.list-cell {
-    -fx-background-color: rgb(245, 245, 245);
-}
-
-.list-cell:empty {
-    -fx-opacity: 0;
-}
+/* JavaFx styles */
 
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
@@ -31,7 +15,7 @@
     -fx-background-insets: 0em;
 }
 
-.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .increment-button,
 .scroll-bar:vertical .decrement-button,
 .scroll-bar:horizontal .increment-button ,
 .scroll-bar:horizontal .decrement-button {
@@ -40,19 +24,99 @@
     -fx-background-insets: 0em;
 }
 
+/* JFoenix styles*/
+
+.sublist-header {
+    -fx-border-color: rgb(245, 245, 245);
+    -fx-border-width: 10px;
+    -fx-border-insets: 0px;
+    -fx-padding: 0px;
+}
+
+.sublist-item .scroll-bar:vertical {
+    -fx-pref-width: 0px;
+}
+
+.sublist-item .scroll-bar:vertical,
+.sublist-item .scroll-bar:vertical .decrement-arrow,
+.sublist-item .scroll-bar:vertical .increment-arrow,
+.sublist-item .scroll-bar:vertical .decrement-button,
+.sublist-item .scroll-bar:vertical .increment-button,
+.sublist-item .scroll-bar:vertical .thumb,
+.sublist-item .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0em;
+    -fx-background-insets: 0em;
+}
+
+.drop-icon {
+    -fx-background-color: transparent;
+}
+
+/* Own styles */
+
+.main-window {
+    -fx-background-color: white;
+}
+
+.days-list {
+    -fx-effect: none;
+    -fx-background-color: transparent;
+    -fx-padding: 3px;
+}
+
+.days-list-cell {
+    -fx-background-color: transparent;
+}
+
+.entries-list-header {
+    -fx-pref-height: 100%;
+    -fx-background-color: rgb(245, 245, 245);
+}
+
+.entries-list-header-day {
+    -fx-text-fill: rgb(77, 77, 77);
+    -fx-font-weight: bold;
+}
+
+.entries-list-header-duration {
+    -fx-text-fill: lightslategray;
+    -fx-font-weight: bold;
+}
+
+.entries-list {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+}
+
 .time-entry-list-cell {
     -fx-background-color: white;
 }
 
 .time-entry-list-cell:selected {
-    -fx-background-color: #039be5;
+    -fx-effect: dropshadow(one-pass-box, rgba(0, 0, 0, 0.8), 15, 0, 0, 0);
+    -fx-background-insets: 3px 0px;
 }
 
 .time-entry-description {
     -fx-font-size: 14px;
 }
 
+.time-entry-list-cell:selected .time-entry-description {
+    -fx-text-fill: black;
+}
+
+.time-entry-list-cell:selected .time-entry-tags-count {
+    -fx-text-fill: black;
+}
+
 .time-entry-duration {
     -fx-text-fill: lightslategray;
-    -fx-font-size: 16px;
+    -fx-font-size: 15px;
+}
+
+.show-more-button {
+    -fx-text-fill: lightslategray;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
 }

@@ -17,6 +17,7 @@ public class DaysListComponent implements IComponent {
 
     public DaysListComponent() {
         list.setItems(items);
+        list.getStyleClass().add("days-list");
         list.setCellFactory(new DayCell.DayCellFactory());
     }
 
@@ -27,6 +28,7 @@ public class DaysListComponent implements IComponent {
     public void addItems(List<TimeEntry> timeEntries) {
         timeEntries
             .stream()
+            .filter((e) -> e.getDuration() >= 0)
             .collect(Collectors.toCollection(ArrayDeque::new))
             .descendingIterator()
             .forEachRemaining((entry) -> {

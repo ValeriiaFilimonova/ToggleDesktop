@@ -36,12 +36,14 @@ public class MainWindowScene {
         mainContainer.add(daysListComponent.getComponent(), 0, 1);
         GridPane.setVgrow(daysListComponent.getComponent(), Priority.ALWAYS);
 
-        // TODO style the button
         showMoreButton.setVisible(false);
+        showMoreButton.getStyleClass().add("show-more-button");
         showMoreButton.setOnAction((event) -> this.getMoreEntries(daysListComponent.getEarliestDate()));
         mainContainer.add(showMoreButton, 0, 2);
         GridPane.setVgrow(showMoreButton, Priority.NEVER);
         GridPane.setHalignment(showMoreButton, HPos.CENTER);
+
+        mainContainer.getStyleClass().add("main-window");
 
         scene = new Scene(mainContainer, 500, 600);
         scene.getStylesheets().add((getClass().getResource("/styles.css")).toExternalForm());

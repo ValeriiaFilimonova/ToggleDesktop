@@ -23,7 +23,9 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
         Callback<ListView<EntriesListComponent>, ListCell<EntriesListComponent>> {
         @Override
         public ListCell<EntriesListComponent> call(ListView<EntriesListComponent> daysList) {
-            return new DayCell();
+            DayCell dayCell = new DayCell();
+            dayCell.getStyleClass().add("days-list-cell");
+            return dayCell;
         }
     }
 }
