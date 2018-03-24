@@ -48,6 +48,16 @@ public class RunningTimeEntryComponent implements IComponent {
         horizontalContainer.getStyleClass().add("running-entry-container");
     }
 
+    public RunningTimeEntryComponent(TimeEntry entry) {
+        this();
+        timeEntry = entry;
+        entryDescription.setValue(entry.getDescription());
+        startTime = entry.getStart().getTime();
+        startButton.setVisible(false);
+        stopButton.setVisible(true);
+        timer.play();
+    }
+
     public GridPane getComponent() {
         return this.horizontalContainer;
     }

@@ -11,16 +11,13 @@ import java.util.Date;
 
 import lombok.*;
 import org.apache.commons.lang3.time.DateUtils;
-import org.joda.time.Interval;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeEntry {
+public class TimeEntry implements Comparable<TimeEntry> {
     public final static String SHORT_DATE_FORMAT = "yyyy-MM-dd";
 
     @Getter @Setter
@@ -72,6 +69,17 @@ public class TimeEntry {
     @JsonIgnore
     public boolean todaysEntry() {
         return DateUtils.isSameDay(start, Calendar.getInstance().getTime());
+    }
+
+    @Override
+    public int compareTo(TimeEntry entry) {
+        if (getStart().before(entry.getStart())) {
+            return -1;
+        }
+        if (getStart().after(entry.getStart())) {
+            return 1;
+        }
+        return 0;
     }
 
     public static String formatDuration(int durationInSeconds) {

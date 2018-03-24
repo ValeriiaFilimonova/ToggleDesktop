@@ -38,17 +38,16 @@ public class ToggleClient {
 
     public Company getCompanyById(String companyId) {
         WebResource resource = jerseyClient.resource(API_URL + COMPANIES_PATH + companyId);
-        ClientResponse response = performGetRequest(resource);
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
-        Company.CompanyData companyData = response.getEntity(Company.CompanyData.class);
-        return companyData.getData();
+        return validateResponse(response).getEntity(Company.CompanyData.class).getData();
     }
 
     public Project getProjectById(String projectId) {
         WebResource resource = jerseyClient.resource(API_URL + PROJECTS_PATH + projectId);
-        ClientResponse response = performGetRequest(resource);
-        Project.ProjectData projectData = response.getEntity(Project.ProjectData.class);
-        return projectData.getData();
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+
+        return validateResponse(response).getEntity(Project.ProjectData.class).getData();
     }
 
     @SneakyThrows
@@ -60,12 +59,7 @@ public class ToggleClient {
             .type(MediaType.APPLICATION_JSON_TYPE)
             .post(ClientResponse.class, objectMapper.writeValueAsString(requestBody));
 
-        // TODO move to method
-        if (response.getStatus() != 200) {
-            String errorMessage = response.getEntity(String.class);
-            throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
-        }
-        return response.getEntity(TimeEntry.TimeEntryResponseData.class).getData();
+        return validateResponse(response).getEntity(TimeEntry.TimeEntryResponseData.class).getData();
     }
 
     @SneakyThrows
@@ -76,11 +70,14 @@ public class ToggleClient {
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .put(ClientResponse.class, objectMapper.writeValueAsString(requestBody));
 
-        if (response.getStatus() != 200) {
-            String errorMessage = response.getEntity(String.class);
-            throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
-        }
-        return response.getEntity(TimeEntry.TimeEntryResponseData.class).getData();
+        return validateResponse(response).getEntity(TimeEntry.TimeEntryResponseData.class).getData();
+    }
+
+    public TimeEntry getRunningTimeEntry() {
+        WebResource resource = jerseyClient.resource(API_URL + TIME_ENTRIES_PATH + "/current");
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+
+        return validateResponse(response).getEntity(TimeEntry.TimeEntryResponseData.class).getData();
     }
 
     public List<TimeEntry> getTimeEntriesBeforeDate(Date endDate, int count) {
@@ -95,16 +92,21 @@ public class ToggleClient {
             .resource(API_URL + TIME_ENTRIES_PATH)
             .queryParam("start_date", dateFormatter.format(calendar.getTime()))
             .queryParam("end_date", dateFormatter.format(endDate));
-        ClientResponse response = performGetRequest(resource);
-        return response.getEntity(new GenericType<List<TimeEntry>>() {});
+        ClientResponse response = resource
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .get(ClientResponse.class);
+
+        return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
     }
 
     public List<TimeEntry> getMonthTimeEntries() {
         WebResource resource = jerseyClient
             .resource(API_URL + TIME_ENTRIES_PATH)
             .queryParam("start_date", getMonthDateString());
-        ClientResponse response = performGetRequest(resource);
-        return response.getEntity(new GenericType<List<TimeEntry>>() {});
+        ClientResponse response = resource
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .get(ClientResponse.class);
+        return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
     }
 
     private String getMonthDateString() {
@@ -114,14 +116,11 @@ public class ToggleClient {
         return dateFormatter.format(calendar.getTime());
     }
 
-    private ClientResponse performGetRequest(WebResource resource) {
-        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
-
+    private ClientResponse validateResponse(ClientResponse response) {
         if (response.getStatus() != 200) {
             String errorMessage = response.getEntity(String.class);
             throw new RuntimeException(String.format("Status %d: %s", response.getStatus(), errorMessage));
         }
-
         return response;
     }
 

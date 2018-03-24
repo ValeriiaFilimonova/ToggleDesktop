@@ -27,6 +27,7 @@ public class DaysListComponent implements IComponent {
 
     public void addItem(TimeEntry timeEntry) {
         addEntryToSubList(timeEntry);
+        this.list.refresh();
     }
 
     public void addItems(List<TimeEntry> timeEntries) {
@@ -36,6 +37,7 @@ public class DaysListComponent implements IComponent {
             .collect(Collectors.toCollection(ArrayDeque::new))
             .descendingIterator()
             .forEachRemaining(this::addEntryToSubList);
+        this.list.refresh();
     }
 
     public String getEarliestDate() {

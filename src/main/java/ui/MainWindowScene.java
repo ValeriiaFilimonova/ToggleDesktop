@@ -23,7 +23,7 @@ public class MainWindowScene {
 
     private Scene scene;
     private GridPane mainContainer = new GridPane();
-    private RunningTimeEntryComponent runningTimeEntryComponent = new RunningTimeEntryComponent();
+    private RunningTimeEntryComponent runningTimeEntryComponent = this.initRunningEntryComponent();
     private DaysListComponent daysListComponent = new DaysListComponent();
     private JFXButton showMoreButton = new JFXButton("Show more");
 
@@ -54,6 +54,16 @@ public class MainWindowScene {
 
     public Scene getScene() {
         return scene;
+    }
+
+    private RunningTimeEntryComponent initRunningEntryComponent() {
+        ToggleClient toggleClient = ToggleClient.getInstance();
+        TimeEntry entry = toggleClient.getRunningTimeEntry();
+
+        if (entry.getId() != null) {
+            return new RunningTimeEntryComponent(entry);
+        }
+        return new RunningTimeEntryComponent();
     }
 
     private void loadEntries() {
