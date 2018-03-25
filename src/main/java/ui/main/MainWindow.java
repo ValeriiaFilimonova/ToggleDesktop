@@ -1,4 +1,4 @@
-package ui;
+package ui.main;
 
 import com.jfoenix.controls.JFXButton;
 
@@ -18,8 +18,8 @@ import javafx.scene.layout.Priority;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 
-public class MainWindowScene {
-    private static int DEFAULT_ENTRIES_COUNT = 3;
+public class MainWindow {
+    private static int DEFAULT_DAYS_COUNT = 3;
 
     private Scene scene;
     private GridPane mainContainer = new GridPane();
@@ -27,7 +27,7 @@ public class MainWindowScene {
     private DaysListComponent daysListComponent = new DaysListComponent();
     private JFXButton showMoreButton = new JFXButton("Show more");
 
-    public MainWindowScene() {
+    public MainWindow() {
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
         GridPane runningTimeEntry = runningTimeEntryComponent.getComponent();
         GridPane.setVgrow(runningTimeEntry, Priority.NEVER);
@@ -60,14 +60,14 @@ public class MainWindowScene {
         ToggleClient toggleClient = ToggleClient.getInstance();
         TimeEntry entry = toggleClient.getRunningTimeEntry();
 
-        if (entry.getId() != null) {
+        if (entry != null && entry.getId() != null) {
             return new RunningTimeEntryComponent(entry);
         }
         return new RunningTimeEntryComponent();
     }
 
     private void loadEntries() {
-        LoadService service = new LoadService(Calendar.getInstance().getTime(), DEFAULT_ENTRIES_COUNT);
+        LoadService service = new LoadService(Calendar.getInstance().getTime(), DEFAULT_DAYS_COUNT);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() > 0) {
@@ -81,7 +81,7 @@ public class MainWindowScene {
     @SneakyThrows
     private void getMoreEntries(String dateString) {
         LoadService service = new LoadService(new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString),
-            DEFAULT_ENTRIES_COUNT + 2);
+            DEFAULT_DAYS_COUNT + 2);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() == 0) {
@@ -93,7 +93,7 @@ public class MainWindowScene {
     }
 
     @AllArgsConstructor
-    static class LoadService extends Service<List<TimeEntry>> {
+    private static class LoadService extends Service<List<TimeEntry>> {
         private Date date;
         private int count;
 

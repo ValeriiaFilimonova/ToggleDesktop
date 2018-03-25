@@ -1,4 +1,4 @@
-package ui;
+package ui.main;
 
 import com.jfoenix.controls.JFXListView;
 
@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import api.TimeEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import ui.IComponent;
 
 public class DaysListComponent implements IComponent {
     private JFXListView<EntriesListComponent> list = new JFXListView<>();

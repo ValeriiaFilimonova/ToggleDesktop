@@ -1,31 +1,44 @@
 package api;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Cache {
     private ToggleClient toggleClient = ToggleClient.getInstance();
 
-    private Map<String, Project> projects = new HashMap<>();
-    private Map<String, Company> companies = new HashMap<>();
+    private Map<String, Project> projectsMap = new HashMap<>();
+    private Map<String, Company> companiesMap = new HashMap<>();
 
+    private Cache() {
+        List<Project> projects = toggleClient.getAllProjects();
+
+        for (Project project : projects) {
+            projectsMap.put(project.getId(), project);
+        }
+    }
+
+    public Collection<Project> getAllProjects() {
+        return projectsMap.values();
+    }
 
     public Project getProject(String projectId) {
-        if (!projects.containsKey(projectId)) {
+        if (!projectsMap.containsKey(projectId)) {
             Project project = toggleClient.getProjectById(projectId);
-            projects.put(projectId, project);
+            projectsMap.put(projectId, project);
         }
 
-        return projects.get(projectId);
+        return projectsMap.get(projectId);
     }
 
     public Company getCompany(String companyId) {
-        if(!companies.containsKey(companyId)) {
+        if (!companiesMap.containsKey(companyId)) {
             Company company = toggleClient.getCompanyById(companyId);
-            companies.put(companyId, company);
+            companiesMap.put(companyId, company);
         }
 
-        return companies.get(companyId);
+        return companiesMap.get(companyId);
     }
 
     private static Cache cacheInstance = null;

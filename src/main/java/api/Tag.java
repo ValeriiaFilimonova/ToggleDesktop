@@ -19,4 +19,9 @@ public enum Tag {
             .capitalize(super.toString().toLowerCase())
             .intern();
     }
+
+    @Override
+    public String toString() {
+        return toValue();
+    }
 }

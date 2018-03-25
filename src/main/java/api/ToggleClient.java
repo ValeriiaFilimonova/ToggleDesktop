@@ -26,6 +26,7 @@ public class ToggleClient {
 
     private final static String API_URL = "https://www.toggl.com/api/v8/";
     private final static String TIME_ENTRIES_PATH = "time_entries";
+    private final static String WORKSPACES_PATH = "workspaces/";
     private final static String PROJECTS_PATH = "projects/";
     private final static String COMPANIES_PATH = "clients/";
 
@@ -41,6 +42,13 @@ public class ToggleClient {
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
         return validateResponse(response).getEntity(Company.CompanyData.class).getData();
+    }
+
+    public List<Project> getAllProjects() {
+        WebResource resource = jerseyClient.resource(API_URL + WORKSPACES_PATH + "1580497/projects"); // TODO
+        ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
+
+        return validateResponse(response).getEntity(new GenericType<List<Project>>() {});
     }
 
     public Project getProjectById(String projectId) {

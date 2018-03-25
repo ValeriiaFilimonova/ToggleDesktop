@@ -22,7 +22,7 @@ apply plugin: 'javafx-gradle-plugin'
 dependencies {
     compileOnly "org.projectlombok:lombok:1.16.8"
 
-    compile 'com.jfoenix:jfoenix:8.0.1'
+    compile 'com.jfoenix:jfoenix:8.0.3'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.6'
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
     compile group: 'com.sun.jersey', name: 'jersey-client', version: '1.19.4'

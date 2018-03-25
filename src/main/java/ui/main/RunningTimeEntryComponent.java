@@ -1,4 +1,4 @@
-package ui;
+package ui.main;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.joda.time.Interval;
 import org.joda.time.Period;
+import ui.IComponent;
 
 public class RunningTimeEntryComponent implements IComponent {
     private static String DEFAULT_TIMER_LABEL_TEXT = "00:00:00";

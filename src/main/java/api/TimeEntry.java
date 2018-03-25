@@ -54,6 +54,15 @@ public class TimeEntry implements Comparable<TimeEntry> {
     }
 
     @JsonIgnore
+    public Tag getFirstTag() {
+        if (tags == null) {
+            return null;
+        }
+
+        return tags[0];
+    }
+
+    @JsonIgnore
     public Project getProject() {
         if (pid == null) {
             return null;
