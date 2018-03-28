@@ -1,6 +1,7 @@
 package ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDrawersStack;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -22,12 +23,13 @@ public class MainWindow {
     private static int DEFAULT_DAYS_COUNT = 3;
 
     private Scene scene;
-    private GridPane mainContainer = new GridPane();
     private RunningTimeEntryComponent runningTimeEntryComponent = this.initRunningEntryComponent();
     private DaysListComponent daysListComponent = new DaysListComponent();
     private JFXButton showMoreButton = new JFXButton("Show more");
 
     public MainWindow() {
+        GridPane mainContainer = new GridPane();
+
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
         GridPane runningTimeEntry = runningTimeEntryComponent.getComponent();
         GridPane.setVgrow(runningTimeEntry, Priority.NEVER);
@@ -46,7 +48,10 @@ public class MainWindow {
 
         mainContainer.getStyleClass().add("main-window");
 
-        scene = new Scene(mainContainer, 500, 600);
+        JFXDrawersStack drawersStack = new JFXDrawersStack();
+        drawersStack.setContent(mainContainer);
+
+        scene = new Scene(drawersStack, 500, 600);
         scene.getStylesheets().add((getClass().getResource("/styles.css")).toExternalForm());
 
         loadEntries();
@@ -67,7 +72,7 @@ public class MainWindow {
     }
 
     private void loadEntries() {
-        LoadService service = new LoadService(Calendar.getInstance().getTime(), DEFAULT_DAYS_COUNT);
+        LoadService service = new LoadService(Calendar.getInstance().getTime(), 1);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() > 0) {

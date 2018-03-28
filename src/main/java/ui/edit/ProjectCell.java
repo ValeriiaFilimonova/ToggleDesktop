@@ -5,6 +5,8 @@ import api.Project;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.util.Callback;
 
 public class ProjectCell extends ListCell<Project> {
@@ -25,7 +27,9 @@ public class ProjectCell extends ListCell<Project> {
     public static class ProjectCellFactory implements Callback<ListView<Project>, ListCell<Project>> {
         @Override
         public ListCell<Project> call(ListView<Project> list) {
-            return new ProjectCell();
+            ProjectCell cell = new ProjectCell();
+            cell.getStyleClass().add("project-cell");
+            return cell;
         }
     }
 }

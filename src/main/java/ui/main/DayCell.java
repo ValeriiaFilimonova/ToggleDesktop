@@ -1,13 +1,17 @@
 package ui.main;
 
+import com.jfoenix.controls.JFXDrawersStack;
 import com.jfoenix.controls.JFXListCell;
-import com.jfoenix.controls.JFXPopup;
 
 import api.TimeEntry;
-import javafx.scene.Group;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.Effect;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Window;
 import javafx.util.Callback;
 import ui.edit.EditWindow;
@@ -24,12 +28,17 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
 
             entriesList.setOnMouseClicked((MouseEvent e) -> {
                 Window window = entriesList.getScene().getWindow();
-                Group parent = (Group) entriesList.getParent().getParent().getParent().getParent();
                 TimeEntry selectedEntry = entriesList.getSelectionModel().getSelectedItem();
                 EditWindow editWindow = new EditWindow(selectedEntry, window.getWidth() * 0.8);
-                JFXPopup popup = editWindow.getWindow();
+                JFXDrawersStack drawersStack = (JFXDrawersStack) entriesList.getScene().getRoot();
 
-                popup.show(parent, JFXPopup.PopupVPosition.TOP, JFXPopup.PopupHPosition.LEFT, window.getWidth(), 0);
+                ColorAdjust blurEffect = new ColorAdjust(0, -0.5, -0.3, 0);
+                blurEffect.setInput(new GaussianBlur());
+
+                GridPane mainWindow = (GridPane) drawersStack.getContent();
+                mainWindow.setEffect(blurEffect);
+
+                drawersStack.toggle(editWindow.getComponent());
             });
         }
     }

@@ -24,14 +24,7 @@
     -fx-background-insets: 0em;
 }
 
-/* JFoenix styles*/
-
-.sublist-header {
-    -fx-border-color: rgb(245, 245, 245);
-    -fx-border-width: 10px;
-    -fx-border-insets: 0px;
-    -fx-padding: 0px;
-}
+/* JFoenix styles */
 
 .sublist-item .scroll-bar:vertical {
     -fx-pref-width: 0px;
@@ -49,26 +42,28 @@
     -fx-background-insets: 0em;
 }
 
-.drop-icon {
-    -fx-background-color: transparent;
-}
-
-/* Own styles */
+/* Main window styles */
 
 .main-window {
     -fx-background-color: white;
+}
+
+.main-window .show-more-button {
+    -fx-text-fill: lightslategray;
+    -fx-font-weight: bold;
+    -fx-background-color: transparent;
 }
 
 .running-entry-container {
     -fx-background-color: rgb(45, 43, 44);
 }
 
-.description-text-input {
+.running-entry-container .description-text-input {
     -fx-text-fill: white;
     -fx-prompt-text-fill: lightgray;
 }
 
-.start-stop-button {
+.running-entry-container .start-stop-button {
     -fx-text-fill: white;
     -fx-background-color: rgb(77, 217, 101);
     -fx-background-radius: 0em;
@@ -78,6 +73,17 @@
     -fx-effect: none;
     -fx-background-color: transparent;
     -fx-padding: 3px;
+}
+
+.days-list .sublist-header {
+    -fx-border-color: rgb(245, 245, 245);
+    -fx-border-width: 10px;
+    -fx-border-insets: 0px;
+    -fx-padding: 0px;
+}
+
+.days-list .drop-icon {
+    -fx-background-color: transparent;
 }
 
 .days-list-cell {
@@ -113,7 +119,7 @@
     -fx-background-insets: 3px 0px;
 }
 
-.time-entry-description {
+.time-entry-list-cell .time-entry-description {
     -fx-font-size: 14px;
 }
 
@@ -130,8 +136,70 @@
     -fx-font-size: 15px;
 }
 
-.show-more-button {
+/* Edit drawer styles */
+
+.edit-container {
+    -fx-background-color: rgb(245, 245, 245);
+}
+
+.edit-container .input-line {
+    -fx-pref-height: 0px;
+    -fx-pref-width: 100%;
+}
+
+.edit-container .entry-edit-description {
+    -fx-background-color: white;
+    -fx-padding: 5px 10px;
+    -jfx-focus-color: green;
+}
+
+.edit-container .entry-edit-project {
+    -fx-background-color: white;
+}
+
+.edit-container .jfx-combo-box {
+    -jfx-focus-color: green;
+    -fx-pref-width: 100%;
+}
+
+.edit-container .jfx-combo-box .jfx-list-cell:focused {
+    -fx-background-color: green;
+}
+
+.edit-container .jfx-list-cell .jfx-rippler {
+    -jfx-rippler-fill: red;
+}
+
+.edit-container .entry-edit-duration {
     -fx-text-fill: lightslategray;
     -fx-font-weight: bold;
-    -fx-background-color: transparent;
+}
+
+.edit-container .jfx-time-picker {
+    -jfx-default-color: green;
+    -fx-background-color: white;
+    -fx-padding: 2px 0px 2px 5px;
+}
+
+.edit-container .jfx-date-picker {
+    -jfx-default-color: green;
+    -fx-background-color: white;
+    -fx-padding: 2px 0px 2px 5px;
+}
+
+.project-cell {
+    -fx-background-color: white;
+}
+
+.multi-select-list {
+    -fx-effect: none;
+    -fx-background-color: rgb(245, 245, 245);
+}
+
+.multi-select-list .picked-item {
+    -fx-background-color: green;
+}
+
+.multi-select-list .selected-items-container {
+    -fx-pref-width : 70%;
 }

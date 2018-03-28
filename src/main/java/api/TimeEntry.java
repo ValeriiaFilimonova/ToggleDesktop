@@ -6,8 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.*;
 import org.apache.commons.lang3.time.DateUtils;
@@ -54,12 +54,12 @@ public class TimeEntry implements Comparable<TimeEntry> {
     }
 
     @JsonIgnore
-    public Tag getFirstTag() {
+    public List<String> getTagsAsStringList() {
         if (tags == null) {
-            return null;
+            return new ArrayList<>();
         }
 
-        return tags[0];
+        return Arrays.stream(tags).map(Tag::toString).collect(Collectors.toList());
     }
 
     @JsonIgnore
