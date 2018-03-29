@@ -26,8 +26,4 @@ public enum Tag {
     public String toString() {
         return toValue();
     }
-
-    public static String[] getAllAsStrings() {
-        return Arrays.stream(Tag.values()).map(Tag::toString).toArray(String[]::new);
-    }
 }

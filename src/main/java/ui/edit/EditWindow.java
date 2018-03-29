@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -26,6 +27,8 @@ import lombok.Getter;
 import ui.IComponent;
 
 public class EditWindow implements IComponent {
+    static Project EMPTY_PROJECT = new Project("No project", "No project");
+
     private JFXDrawer drawer = new JFXDrawer();
     private Image closeIcon = new Image(this.getClass().getResourceAsStream("/cross.png"), 15, 15, true, true);
     private ImageView closeButton = new ImageView(closeIcon);
@@ -36,7 +39,7 @@ public class EditWindow implements IComponent {
     private JFXTimePicker endTime = new JFXTimePicker();
     private Label durationLabel = new Label("00:00:00");
     private JFXDatePicker datePicker = new JFXDatePicker();
-    private MultiSelectStringView tagsSelectInput = new MultiSelectStringView(Tag.getAllAsStrings());
+    private MultiSelectStringView<Tag> tagsSelectInput = new MultiSelectStringView<>(Tag.values());
 
     private EditableTimeEntry editableEntry;
 
@@ -56,9 +59,11 @@ public class EditWindow implements IComponent {
         descriptionInput.getStyleClass().add("entry-edit-description");
 
         projectSelectInput.setCellFactory(new ProjectCell.ProjectCellFactory());
-        projectSelectInput.setItems(FXCollections.observableArrayList(Cache.getInstance().getAllProjects()));
+        ObservableList<Project> projects = FXCollections.observableArrayList(EMPTY_PROJECT);
+        projects.addAll(Cache.getInstance().getAllProjects());
+        projectSelectInput.setItems(projects);
+        projectSelectInput.getSelectionModel().selectFirst();
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
-        projectSelectInput.setPromptText("No Project");
         projectSelectInput.getStyleClass().add("entry-edit-project");
 
         companyLabel.textProperty().bind(editableEntry.getCompanyProperty());
@@ -109,16 +114,17 @@ public class EditWindow implements IComponent {
 
         descriptionInput.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.8));
         projectSelectInput.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.75));
-        datePicker.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.5));
+        datePicker.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.55));
 
         GridPane.setHalignment(closeButton, HPos.RIGHT);
         GridPane.setValignment(closeButton, VPos.TOP);
+        GridPane.setMargin(closeButton, new Insets(0, 0, 20, 0));
         GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
         GridPane.setHgrow(projectSelectInput, Priority.ALWAYS);
         GridPane.setHgrow(companyLabel, Priority.NEVER);
         GridPane.setHalignment(durationLabel, HPos.CENTER);
         GridPane.setHalignment(datePicker, HPos.LEFT);
-        GridPane.setVgrow(tagsSelectInput.getComponent(), Priority.NEVER);
+        GridPane.setVgrow(tagsSelectInput.getComponent(), Priority.ALWAYS);
 
         drawer.setDirection(JFXDrawer.DrawerDirection.RIGHT);
         drawer.setDefaultDrawerSize(width);
@@ -161,7 +167,7 @@ public class EditWindow implements IComponent {
         private SimpleObjectProperty<LocalDate> dateProperty = new SimpleObjectProperty<>();
 
         @Getter
-        private SimpleListProperty<String> tagsProperty = new SimpleListProperty<>();
+        private SimpleListProperty<Tag> tagsProperty = new SimpleListProperty<>();
 
         public EditableTimeEntry(TimeEntry entry) {
             descriptionProperty.set(entry.getDescription());
@@ -169,6 +175,8 @@ public class EditWindow implements IComponent {
             if (entry.getProject() != null) {
                 projectProperty.set(entry.getProject());
                 companyProperty.set(entry.getProject().getCompanyName());
+            } else {
+                projectProperty.set(EMPTY_PROJECT);
             }
 
             projectProperty.addListener((o, oldValue, newValue) -> companyProperty.set(newValue.getCompanyName()));
@@ -187,7 +195,7 @@ public class EditWindow implements IComponent {
             startTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
             endTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
 
-            tagsProperty.set(FXCollections.observableArrayList(entry.getTagsAsStringList()));
+            tagsProperty.set(FXCollections.observableArrayList(entry.getTags()));
 
             updateDuration();
         }

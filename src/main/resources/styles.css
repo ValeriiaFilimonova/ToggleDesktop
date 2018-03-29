@@ -148,9 +148,9 @@
 }
 
 .edit-container .entry-edit-description {
+    -jfx-focus-color: rgb(0, 150, 130);
     -fx-background-color: white;
-    -fx-padding: 5px 10px;
-    -jfx-focus-color: green;
+    -fx-padding: 7px;
 }
 
 .edit-container .entry-edit-project {
@@ -158,16 +158,16 @@
 }
 
 .edit-container .jfx-combo-box {
-    -jfx-focus-color: green;
+    -jfx-focus-color: rgb(0, 150, 130);
     -fx-pref-width: 100%;
 }
 
 .edit-container .jfx-combo-box .jfx-list-cell:focused {
-    -fx-background-color: green;
+    -fx-background-color: rgb(0, 150, 130);
 }
 
 .edit-container .jfx-list-cell .jfx-rippler {
-    -jfx-rippler-fill: red;
+    -jfx-rippler-fill: none;
 }
 
 .edit-container .entry-edit-duration {
@@ -176,15 +176,15 @@
 }
 
 .edit-container .jfx-time-picker {
-    -jfx-default-color: green;
+    -jfx-default-color: rgb(0, 150, 130);
     -fx-background-color: white;
-    -fx-padding: 2px 0px 2px 5px;
+    -fx-padding: 2px 0px 2px 7px;
 }
 
 .edit-container .jfx-date-picker {
-    -jfx-default-color: green;
+    -jfx-default-color: rgb(0, 150, 130);
     -fx-background-color: white;
-    -fx-padding: 2px 0px 2px 5px;
+    -fx-padding: 2px 0px 2px 7px;
 }
 
 .project-cell {
@@ -197,9 +197,29 @@
 }
 
 .multi-select-list .picked-item {
-    -fx-background-color: green;
+    -fx-background-color: rgb(0, 150, 130);
+    -fx-text-fill: white;
 }
 
 .multi-select-list .selected-items-container {
-    -fx-pref-width : 70%;
+    -fx-border-insets: 0px;
+    -fx-padding: 0px;
+}
+
+.multi-select-list .suggestion-list {
+    -fx-effect: none;
+    -fx-background-color: rgb(245, 245, 245);
+}
+
+.multi-select-list .suggestion-list .list-cell:empty {
+    -fx-opacity: 0;
+}
+
+.multi-select-list .suggestion-item {
+    -fx-background-color: white;
+}
+
+.multi-select-list .suggestion-item:selected {
+    -fx-background-color: lightgray;
+    -fx-text-fill: black;
 }

@@ -29,7 +29,7 @@ public class TimeEntry implements Comparable<TimeEntry> {
     @Setter
     private String description;
 
-    @Getter @Setter
+    @Setter
     private Tag[] tags;
 
     @Getter @Setter
@@ -53,13 +53,12 @@ public class TimeEntry implements Comparable<TimeEntry> {
         return description;
     }
 
-    @JsonIgnore
-    public List<String> getTagsAsStringList() {
+    public Tag[] getTags() {
         if (tags == null) {
-            return new ArrayList<>();
+            return new Tag[] {};
         }
 
-        return Arrays.stream(tags).map(Tag::toString).collect(Collectors.toList());
+        return tags;
     }
 
     @JsonIgnore

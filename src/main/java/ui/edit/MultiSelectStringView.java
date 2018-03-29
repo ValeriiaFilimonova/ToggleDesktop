@@ -2,10 +2,12 @@ package ui.edit;
 
 import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
-import com.jfoenix.svg.SVGGlyph;
+
+import java.util.List;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
@@ -21,25 +23,45 @@ import javafx.scene.text.TextAlignment;
 import lombok.Getter;
 import ui.IComponent;
 
-public class MultiSelectStringView implements IComponent {
+public class MultiSelectStringView<T> implements IComponent {
     private static int SELECTED_ITEMS_PANE_GAP = 3;
     private static int SELECTED_ITEM_PADDING = 3;
 
     @Getter
-    private SimpleListProperty<String> selectedItemsProperty =
-        new SimpleListProperty<>(FXCollections.observableArrayList());
+    private SimpleListProperty<T> selectedItemsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    private ObservableList<String> pickList = FXCollections.observableArrayList();
+    private ObservableList<T> pickList = FXCollections.observableArrayList();
 
     private Image removeIcon = new Image(this.getClass().getResourceAsStream("/cross.png"), 10, 10, true, true);
-    private FlowPane selectedItemsPane = this.initSelectedItemsNode();
-    private JFXListView<String> suggestionList = this.initSuggestionList();
-    private JFXListView<JFXListView<String>> mainList = this.initMainComponent();
+    private FlowPane selectedItemsPane = this.initSelectedItemsPane();
+    private JFXListView<T> suggestionList = this.initSuggestionList();
+    private JFXListView<JFXListView<T>> mainList = this.initMainComponent();
 
-    public MultiSelectStringView(String... itemsToPickFrom) {
+    public MultiSelectStringView(T... itemsToPickFrom) {
         if (itemsToPickFrom != null) {
             pickList.addAll(itemsToPickFrom);
         }
+
+        selectedItemsProperty.addListener((ListChangeListener<? super T>) (e) -> {
+            e.next();
+
+            if (e.wasAdded()) {
+                List<? extends T> addedItems = e.getAddedSubList();
+
+                for (T item : addedItems) {
+                    pickList.remove(item);
+                    selectedItemsPane.getChildren().add(initSelectedItemLabel(item));
+                }
+            }
+            if (e.wasRemoved()) {
+                List<? extends T> removedItems = e.getRemoved();
+
+                for (T item : removedItems) {
+                    pickList.add(item);
+                    selectedItemsPane.getChildren().removeIf(node -> ((Label) node).getText().equals(item.toString()));
+                }
+            }
+        });
     }
 
     @Override
@@ -47,15 +69,14 @@ public class MultiSelectStringView implements IComponent {
         return mainList;
     }
 
-    public SimpleListProperty<String> selectedItemsProperty() {
+    public SimpleListProperty<T> selectedItemsProperty() {
         return selectedItemsProperty;
     }
 
-    private FlowPane initSelectedItemsNode() {
+    private FlowPane initSelectedItemsPane() {
         FlowPane selectedItemsPane = new FlowPane();
 
         selectedItemsPane.setPadding(new Insets(0, 5, 0, 5));
-        selectedItemsPane.getStyleClass().add("selected-items-container");
         selectedItemsPane.setHgap(SELECTED_ITEMS_PANE_GAP);
         selectedItemsPane.setVgap(SELECTED_ITEMS_PANE_GAP);
         selectedItemsPane.setOnMouseClicked((e) -> {
@@ -66,80 +87,98 @@ public class MultiSelectStringView implements IComponent {
         return selectedItemsPane;
     }
 
-    private JFXListView<String> initSuggestionList() {
-        JFXListView<String> suggestionList = new JFXListView<>();
+    private JFXListView<T> initSuggestionList() {
+        JFXListView<T> suggestionList = new JFXListView<>();
 
         suggestionList.setItems(pickList);
         suggestionList.setGroupnode(selectedItemsPane);
         suggestionList.getStyleClass().add("suggestion-list");
+        suggestionList.setCellFactory((item) -> new SuggestionCell<T>());
         suggestionList.setOnMouseClicked((e) -> {
-            String selectedItem = suggestionList.getSelectionModel().getSelectedItem();
-            pickList.remove(selectedItem);
-
-            if (pickList.size() == 0) {
-                mainList.setExpanded(false);
-            }
+            T selectedItem = suggestionList.getSelectionModel().getSelectedItem();
 
             if (selectedItem != null) {
-                ImageView imageView = new ImageView(removeIcon);
-                imageView.setOnMouseClicked((event) -> {
-                    event.consume();
-                    ImageView view = (ImageView) event.getSource();
-                    Bounds bounds = view.localToScene(view.getBoundsInLocal());
-
-                    if (bounds.contains(event.getSceneX() - SELECTED_ITEM_PADDING, event.getSceneY() - SELECTED_ITEM_PADDING)) {
-                        Label clickedLabel = (Label) view.getParent();
-                        selectedItemsPane.getChildren().remove(clickedLabel);
-                        selectedItemsProperty.remove(clickedLabel.getText());
-                        pickList.add(clickedLabel.getText());
-                    }
-                });
-
-                Label label = new Label(selectedItem, imageView);
-                label.setPadding(new Insets(SELECTED_ITEM_PADDING));
-                label.getStyleClass().add("picked-item");
-                label.setTextAlignment(TextAlignment.CENTER);
-                label.setOnMouseClicked((event) -> {
-                    event.consume();
-                    label.getGraphic().fireEvent(event);
-                });
-
-                selectedItemsPane.getChildren().add(label);
-                selectedItemsProperty.add(label.getText());
+                selectedItemsProperty.add(selectedItem);
             }
         });
 
         return suggestionList;
     }
 
-    private JFXListView<JFXListView<String>> initMainComponent() {
-        JFXListView<JFXListView<String>> mainList = new JFXListView<>();
+    private JFXListView<JFXListView<T>> initMainComponent() {
+        JFXListView<JFXListView<T>> mainList = new JFXListView<>();
 
         mainList.getItems().add(suggestionList);
-        mainList.setCellFactory((list) -> new SubListCell());
+        mainList.setCellFactory((list) -> new SubListCell<T>());
         mainList.getStyleClass().add("multi-select-list");
 
         return mainList;
     }
 
-    private static class SubListCell extends JFXListCell<JFXListView<String>> {
+    private Label initSelectedItemLabel(T selectedItem) {
+        Label label = new Label(selectedItem.toString(), initRemoveIcon());
+        label.setPadding(new Insets(SELECTED_ITEM_PADDING));
+        label.getStyleClass().add("picked-item");
+        label.setTextAlignment(TextAlignment.CENTER);
+        label.setOnMouseClicked((event) -> {
+            event.consume();
+            label.getGraphic().fireEvent(event);
+        });
+
+        return label;
+    }
+
+    private ImageView initRemoveIcon() {
+        ImageView imageView = new ImageView(removeIcon);
+        imageView.setOnMouseClicked((event) -> {
+            ImageView view = (ImageView) event.getSource();
+            Bounds bounds = view.localToScene(view.getBoundsInLocal());
+
+            if (bounds.contains(event.getSceneX(), event.getSceneY())) {
+                event.consume();
+                Label clickedLabel = (Label) view.getParent();
+                T selected = selectedItemsProperty.stream()
+                    .filter((t) -> t.toString().equals(clickedLabel.getText()))
+                    .findAny().orElse(null);
+
+                if (selected != null) {
+                    selectedItemsProperty.remove(selected);
+                }
+            }
+        });
+
+        return imageView;
+    }
+
+    private static class SuggestionCell<T> extends JFXListCell<T> {
         @Override
-        protected void updateItem(JFXListView<String> list, boolean empty) {
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+
+            if (item != null) {
+                this.setText(item.toString());
+                this.setGraphic(null);
+                this.getStyleClass().add("suggestion-item");
+            }
+        }
+    }
+
+    private static class SubListCell<T> extends JFXListCell<JFXListView<T>> {
+        @Override
+        protected void updateItem(JFXListView<T> list, boolean empty) {
             super.updateItem(list, empty);
 
             if (list != null) {
                 VBox contentHolder = (VBox) list.getParent().getParent();
-                StackPane groupNode = (StackPane) contentHolder.getChildren().get(0);
-                VBox.setVgrow(groupNode, Priority.NEVER);
-                FlowPane flowPane = (FlowPane) groupNode.getChildren().get(0);
-                StackPane.setAlignment(flowPane, Pos.CENTER_LEFT);
-                SVGGlyph dropIcon = (SVGGlyph) groupNode.getChildren().get(1);
 
-                dropIcon.setOnMouseClicked(contentHolder.getOnMouseClicked());
-                contentHolder.setOnMouseClicked((e) -> {
-                    e.consume();
-                    flowPane.fireEvent(e);
-                });
+                StackPane groupNode = (StackPane) contentHolder.getChildren().get(0);
+                groupNode.getStyleClass().add("selected-items-container");
+                VBox.setVgrow(groupNode, Priority.NEVER);
+
+                FlowPane flowPane = (FlowPane) groupNode.getChildren().get(0);
+                flowPane.setMaxWidth(500 * 0.8 * 0.8); // todo whatafuck
+                StackPane.setAlignment(flowPane, Pos.CENTER_LEFT);
+                StackPane.setMargin(flowPane, new Insets(0, 3, 0, 3));
             }
         }
     }

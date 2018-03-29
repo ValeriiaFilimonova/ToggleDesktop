@@ -37,7 +37,7 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
         container.add(getDescriptionNode(item), 0, 0);
         container.add(getProjectNode(item), 0, 1);
 
-        if (item.getTags() != null) {
+        if (item.getTags().length > 0) {
             container.add(getTagsCountNode(item), 1, 0, 1, 2);
         }
 

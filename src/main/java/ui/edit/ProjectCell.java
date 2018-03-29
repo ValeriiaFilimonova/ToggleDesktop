@@ -5,8 +5,6 @@ import api.Project;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.util.Callback;
 
 public class ProjectCell extends ListCell<Project> {
@@ -19,7 +17,9 @@ public class ProjectCell extends ListCell<Project> {
         }
 
         Label label = new Label(project.getName());
-        label.setStyle("-fx-text-fill: " + Color.getColorRgb(project.getColorId()));
+        String color = project.getColorId() == null ? "rgb(119, 136, 153)" : Color.getColorRgb(project.getColorId());
+
+        label.setStyle("-fx-text-fill: " + color);
 
         setGraphic(label);
     }
