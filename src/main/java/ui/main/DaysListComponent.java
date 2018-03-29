@@ -20,7 +20,9 @@ public class DaysListComponent implements IComponent {
         list.setItems(items);
         list.getStyleClass().add("days-list");
         list.setCellFactory(daysList -> {
-            DayCell dayCell = new DayCell(this::updateItem);
+            DayCell dayCell = new DayCell();
+            dayCell.setOnUpdateListener(this::updateItem);
+            dayCell.setOnDeleteListener(this::deleteItem);
             dayCell.getStyleClass().add("days-list-cell");
             return dayCell;
         });
@@ -38,6 +40,11 @@ public class DaysListComponent implements IComponent {
     public void updateItem(TimeEntry timeEntry) {
         removeEntryFromSubList(timeEntry);
         addEntryToSubList(timeEntry);
+        this.list.refresh();
+    }
+
+    public void deleteItem(TimeEntry timeEntry) {
+        removeEntryFromSubList(timeEntry);
         this.list.refresh();
     }
 

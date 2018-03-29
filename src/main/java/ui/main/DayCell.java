@@ -13,8 +13,14 @@ import ui.edit.EditWindow;
 public class DayCell extends JFXListCell<EntriesListComponent> {
     private Consumer<TimeEntry> onUpdateListener;
 
-    public DayCell(Consumer<TimeEntry> onUpdateListener) {
+    private Consumer<TimeEntry> onDeleteListener;
+
+    public void setOnUpdateListener(Consumer<TimeEntry> onUpdateListener) {
         this.onUpdateListener = onUpdateListener;
+    }
+
+    public void setOnDeleteListener(Consumer<TimeEntry> onDeleteListener) {
+        this.onDeleteListener = onDeleteListener;
     }
 
     @Override
@@ -34,6 +40,7 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
                 JFXDrawersStack drawersStack = (JFXDrawersStack) entriesList.getScene().getRoot();
 
                 editWindow.setOnUpdateListener(this.onUpdateListener);
+                editWindow.setOnDeleteListener(this.onDeleteListener);
                 drawersStack.toggle(editWindow.getComponent());
             });
         }

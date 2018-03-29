@@ -1,6 +1,7 @@
 package ui.edit;
 
 import java.time.*;
+import java.util.Date;
 
 import api.Project;
 import api.Tag;
@@ -15,6 +16,7 @@ class EditableTimeEntry {
     @Getter
     private boolean entryChanged = false;
 
+    @Getter
     private TimeEntry originalEntry;
 
     @Getter
@@ -44,6 +46,8 @@ class EditableTimeEntry {
     public EditableTimeEntry(TimeEntry entry) {
         originalEntry = entry;
 
+        // set values
+
         descriptionProperty.set(entry.getDescription());
 
         tagsProperty.set(FXCollections.observableArrayList(entry.getTags()));
@@ -66,6 +70,8 @@ class EditableTimeEntry {
             endTimeProperty.set(dateTime.toLocalTime());
         }
 
+        // set listeners
+
         descriptionProperty.addListener((obs, oldV, newV) -> entryChanged = true);
         dateProperty.addListener((obs, oldV, newV) -> entryChanged = true);
 
@@ -84,6 +90,8 @@ class EditableTimeEntry {
             entryChanged = true;
         });
 
+        tagsProperty.addListener((obs, oldV, newV) -> entryChanged = true);
+
         updateDuration();
     }
 
@@ -92,6 +100,9 @@ class EditableTimeEntry {
 
         newEntry.setDescription(descriptionProperty.get());
         newEntry.setTags(tagsProperty.get().toArray(new Tag[] {}));
+        newEntry.setStart(getDate(dateProperty.get(), startTimeProperty.get()));
+        newEntry.setStop(getDate(dateProperty.get(), endTimeProperty.get()));
+        newEntry.setDuration((int) getDuration().getSeconds());
 
         Project project = projectProperty.get();
         if (project.equals(EditWindow.EMPTY_PROJECT)) {
@@ -103,11 +114,13 @@ class EditableTimeEntry {
         return newEntry;
     }
 
-    private void updateDuration() {
-        LocalDateTime startDateTime = LocalDateTime.of(dateProperty.get(), startTimeProperty.get());
-        LocalDateTime endDateTime = LocalDateTime.of(dateProperty.get(), endTimeProperty.get());
+    private Date getDate(LocalDate date, LocalTime time) {
+        LocalDateTime startTime = LocalDateTime.of(date, time);
+        return Date.from(startTime.atZone(ZoneId.systemDefault()).toInstant());
+    }
 
-        Duration duration = Duration.between(startDateTime, endDateTime);
+    private void updateDuration() {
+        Duration duration = getDuration();
 
         long hours = duration.toHours();
         long minutes = duration.toMinutes() - hours * 60;
@@ -115,5 +128,12 @@ class EditableTimeEntry {
 
         String text = String.format("%02d:%02d:%02d", hours, minutes, seconds);
         durationProperty.set(text);
+    }
+
+    private Duration getDuration() {
+        LocalDateTime startDateTime = LocalDateTime.of(dateProperty.get(), startTimeProperty.get());
+        LocalDateTime endDateTime = LocalDateTime.of(dateProperty.get(), endTimeProperty.get());
+
+        return Duration.between(startDateTime, endDateTime);
     }
 }

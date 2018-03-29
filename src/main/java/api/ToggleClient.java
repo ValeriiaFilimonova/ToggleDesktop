@@ -81,6 +81,15 @@ public class ToggleClient {
         return validateResponse(response).getEntity(TimeEntry.TimeEntryResponseData.class).getData();
     }
 
+    public void deleteTimeEntry(TimeEntry entry) {
+        WebResource resource = jerseyClient.resource(API_URL + TIME_ENTRIES_PATH + "/" + entry.getId());
+        ClientResponse response = resource
+            .accept(MediaType.APPLICATION_JSON_TYPE)
+            .delete(ClientResponse.class);
+
+        validateResponse(response);
+    }
+
     public TimeEntry getRunningTimeEntry() {
         WebResource resource = jerseyClient.resource(API_URL + TIME_ENTRIES_PATH + "/current");
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);

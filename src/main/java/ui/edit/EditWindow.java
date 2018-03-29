@@ -2,6 +2,7 @@ package ui.edit;
 
 import com.jfoenix.controls.*;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Consumer;
@@ -43,9 +44,12 @@ public class EditWindow implements IComponent {
 
     private EditableTimeEntry editableEntry;
     private Consumer<TimeEntry> onUpdateListener;
+    private Consumer<TimeEntry> onDeleteListener;
 
     public EditWindow(TimeEntry entry, double width) {
         editableEntry = new EditableTimeEntry(entry);
+
+        // bind properties
 
         descriptionInput.textProperty().bindBidirectional(editableEntry.getDescriptionProperty());
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
@@ -55,6 +59,8 @@ public class EditWindow implements IComponent {
         endTime.valueProperty().bindBidirectional(editableEntry.getEndTimeProperty());
         datePicker.valueProperty().bindBidirectional(editableEntry.getDateProperty());
         tagsSelectInput.selectedItemsProperty().bindBidirectional(editableEntry.getTagsProperty());
+
+        // place elements in grid
 
         gridPane.add(closeButton, 2, 0);
         gridPane.add(descriptionInput, 0, 1, 3, 1);
@@ -69,6 +75,8 @@ public class EditWindow implements IComponent {
 
         gridPane.setPrefWidth(width);
 
+        // init drawer
+
         drawer.setDirection(JFXDrawer.DrawerDirection.RIGHT);
         drawer.setDefaultDrawerSize(width);
         drawer.setSidePane(gridPane);
@@ -82,6 +90,10 @@ public class EditWindow implements IComponent {
 
     public void setOnUpdateListener(Consumer<TimeEntry> onUpdateListener) {
         this.onUpdateListener = onUpdateListener;
+    }
+
+    public void setOnDeleteListener(Consumer<TimeEntry> onDeleteListener) {
+        this.onDeleteListener = onDeleteListener;
     }
 
     private GridPane initGridPane() {
@@ -193,11 +205,20 @@ public class EditWindow implements IComponent {
     }
 
     private ImageView initDeleteButton() {
-        Image deleteIcon = new Image(this.getClass().getResourceAsStream("/trash.png"), ICON_SIZE, ICON_SIZE, true, true);
+        InputStream input = this.getClass().getResourceAsStream("/trash.png");
+        Image deleteIcon = new Image(input, ICON_SIZE, ICON_SIZE, true, true);
         ImageView deleteButton = new ImageView(deleteIcon);
 
-        // TODO define
-        // deleteButton.setOnMouseClicked(this::onClose);
+        deleteButton.setOnMouseClicked(e -> {
+            TimeEntry entryToDelete = editableEntry.getOriginalEntry();
+            ToggleClient.getInstance().deleteTimeEntry(entryToDelete);
+            editableEntry = null;
+            drawer.close();
+
+            if (onDeleteListener != null) {
+                onDeleteListener.accept(entryToDelete);
+            }
+        });
 
         GridPane.setHalignment(deleteButton, HPos.RIGHT);
         GridPane.setValignment(deleteButton, VPos.BOTTOM);
@@ -207,10 +228,13 @@ public class EditWindow implements IComponent {
     }
 
     private void onClose(Event event) {
-        if (editableEntry.isEntryChanged()) {
-            TimeEntry entryToUpdate = editableEntry.getUpdatedTimeEntry();
-            TimeEntry updatedTimeEntry = ToggleClient.getInstance().updateTimeEntry(entryToUpdate);
-            onUpdateListener.accept(updatedTimeEntry);
+        if (editableEntry != null && editableEntry.isEntryChanged()) {
+            TimeEntry updatedEntry = editableEntry.getUpdatedTimeEntry();
+            TimeEntry entryToUpdate = ToggleClient.getInstance().updateTimeEntry(updatedEntry);
+
+            if (onUpdateListener != null) {
+                onUpdateListener.accept(entryToUpdate);
+            }
         }
     }
 }
