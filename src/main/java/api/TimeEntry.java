@@ -90,6 +90,14 @@ public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
         return 0;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof TimeEntry) {
+            return ((TimeEntry) object).getId().equals(id);
+        }
+        return false;
+    }
+
     public static String formatDuration(int durationInSeconds) {
         int durationInMinutes = durationInSeconds / 60; // TODO use Joda
         int hours = durationInMinutes / 60;

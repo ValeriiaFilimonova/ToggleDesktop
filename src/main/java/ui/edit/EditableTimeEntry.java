@@ -12,6 +12,9 @@ import javafx.collections.FXCollections;
 import lombok.Getter;
 
 class EditableTimeEntry {
+    @Getter
+    private boolean entryChanged = false;
+
     private TimeEntry originalEntry;
 
     @Getter
@@ -40,7 +43,10 @@ class EditableTimeEntry {
 
     public EditableTimeEntry(TimeEntry entry) {
         originalEntry = entry;
+
         descriptionProperty.set(entry.getDescription());
+
+        tagsProperty.set(FXCollections.observableArrayList(entry.getTags()));
 
         if (entry.getProject() != null) {
             projectProperty.set(entry.getProject());
@@ -48,8 +54,6 @@ class EditableTimeEntry {
         } else {
             projectProperty.set(EditWindow.EMPTY_PROJECT);
         }
-
-        projectProperty.addListener((o, oldValue, newValue) -> companyProperty.set(newValue.getCompanyName()));
 
         if (entry.getStart() != null) {
             ZonedDateTime dateTime = entry.getStart().toInstant().atZone(ZoneId.systemDefault());
@@ -62,10 +66,23 @@ class EditableTimeEntry {
             endTimeProperty.set(dateTime.toLocalTime());
         }
 
-        startTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
-        endTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
+        descriptionProperty.addListener((obs, oldV, newV) -> entryChanged = true);
+        dateProperty.addListener((obs, oldV, newV) -> entryChanged = true);
 
-        tagsProperty.set(FXCollections.observableArrayList(entry.getTags()));
+        projectProperty.addListener((obs, oldV, newV) -> {
+            companyProperty.set(newV.getCompanyName());
+            entryChanged = true;
+        });
+
+        startTimeProperty.addListener((obs, oldV, newV) -> {
+            updateDuration();
+            entryChanged = true;
+        });
+
+        endTimeProperty.addListener((obs, oldV, newV) -> {
+            updateDuration();
+            entryChanged = true;
+        });
 
         updateDuration();
     }

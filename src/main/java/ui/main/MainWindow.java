@@ -85,8 +85,8 @@ public class MainWindow {
 
     @SneakyThrows
     private void getMoreEntries(String dateString) {
-        LoadService service = new LoadService(new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString),
-            DEFAULT_DAYS_COUNT + 2);
+        Date date = new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString);
+        LoadService service = new LoadService(date,DEFAULT_DAYS_COUNT + 2);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() == 0) {

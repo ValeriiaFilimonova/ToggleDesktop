@@ -4,6 +4,7 @@ import com.jfoenix.controls.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Consumer;
 
 import api.*;
 import javafx.collections.FXCollections;
@@ -41,6 +42,7 @@ public class EditWindow implements IComponent {
     private ImageView deleteButton = this.initDeleteButton();
 
     private EditableTimeEntry editableEntry;
+    private Consumer<TimeEntry> onUpdateListener;
 
     public EditWindow(TimeEntry entry, double width) {
         editableEntry = new EditableTimeEntry(entry);
@@ -76,6 +78,10 @@ public class EditWindow implements IComponent {
 
     public JFXDrawer getComponent() {
         return drawer;
+    }
+
+    public void setOnUpdateListener(Consumer<TimeEntry> onUpdateListener) {
+        this.onUpdateListener = onUpdateListener;
     }
 
     private GridPane initGridPane() {
@@ -201,7 +207,10 @@ public class EditWindow implements IComponent {
     }
 
     private void onClose(Event event) {
-        TimeEntry updatedTimeEntry = editableEntry.getUpdatedTimeEntry();
-        ToggleClient.getInstance().updateTimeEntry(updatedTimeEntry);
+        if (editableEntry.isEntryChanged()) {
+            TimeEntry entryToUpdate = editableEntry.getUpdatedTimeEntry();
+            TimeEntry updatedTimeEntry = ToggleClient.getInstance().updateTimeEntry(entryToUpdate);
+            onUpdateListener.accept(updatedTimeEntry);
+        }
     }
 }

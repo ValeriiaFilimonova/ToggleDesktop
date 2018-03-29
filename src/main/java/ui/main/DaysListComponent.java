@@ -19,7 +19,11 @@ public class DaysListComponent implements IComponent {
     public DaysListComponent() {
         list.setItems(items);
         list.getStyleClass().add("days-list");
-        list.setCellFactory(new DayCell.DayCellFactory());
+        list.setCellFactory(daysList -> {
+            DayCell dayCell = new DayCell(this::updateItem);
+            dayCell.getStyleClass().add("days-list-cell");
+            return dayCell;
+        });
     }
 
     public JFXListView<EntriesListComponent> getComponent() {
@@ -27,6 +31,12 @@ public class DaysListComponent implements IComponent {
     }
 
     public void addItem(TimeEntry timeEntry) {
+        addEntryToSubList(timeEntry);
+        this.list.refresh();
+    }
+
+    public void updateItem(TimeEntry timeEntry) {
+        removeEntryFromSubList(timeEntry);
         addEntryToSubList(timeEntry);
         this.list.refresh();
     }
@@ -61,6 +71,16 @@ public class DaysListComponent implements IComponent {
             } else {
                 items.add(new EntriesListComponent(timeEntry));
             }
+        }
+    }
+
+    private void removeEntryFromSubList(TimeEntry timeEntry) {
+        Optional<EntriesListComponent> subListOptional = this.list.getItems().stream()
+            .filter((subList) -> subList.getId().equals(timeEntry.getDate()))
+            .findFirst();
+
+        if (subListOptional.isPresent()) {
+            subListOptional.get().removeEntry(timeEntry);
         }
     }
 }

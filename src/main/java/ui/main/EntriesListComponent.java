@@ -52,6 +52,11 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
         items.sort((entry1, entry2) -> entry2.compareTo(entry1));
     }
 
+    public void removeEntry(TimeEntry entry) {
+        sumDuration -= entry.getDuration();
+        items.remove(entry);
+    }
+
     public void updateLabelText() {
         durationLabel.setText(TimeEntry.formatDuration(sumDuration));
     }
