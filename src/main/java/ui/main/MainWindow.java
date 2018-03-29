@@ -72,7 +72,7 @@ public class MainWindow {
     }
 
     private void loadEntries() {
-        LoadService service = new LoadService(Calendar.getInstance().getTime(), 1);
+        LoadService service = new LoadService(Calendar.getInstance().getTime(), DEFAULT_DAYS_COUNT);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() > 0) {

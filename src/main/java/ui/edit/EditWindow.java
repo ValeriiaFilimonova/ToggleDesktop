@@ -2,85 +2,166 @@ package ui.edit;
 
 import com.jfoenix.controls.*;
 
-import java.time.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import api.Cache;
-import api.Project;
-import api.Tag;
-import api.TimeEntry;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import api.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
-import lombok.Getter;
 import ui.IComponent;
 
 public class EditWindow implements IComponent {
     static Project EMPTY_PROJECT = new Project("No project", "No project");
 
+    private static int GRID_GAP = 10;
+    private static int ICON_SIZE = 15;
+
     private JFXDrawer drawer = new JFXDrawer();
-    private Image closeIcon = new Image(this.getClass().getResourceAsStream("/cross.png"), 15, 15, true, true);
-    private ImageView closeButton = new ImageView(closeIcon);
-    private JFXTextField descriptionInput = new JFXTextField();
-    private Label companyLabel = new Label("No Company");
-    private JFXComboBox<Project> projectSelectInput = new JFXComboBox<>();
+    private GridPane gridPane = this.initGridPane();
+    private ImageView closeButton = this.initCloseButton();
+    private JFXTextField descriptionInput = this.initDescriptionInput();
+    private JFXComboBox<Project> projectSelectInput = this.initProjectSelectInput();
+    private Label companyLabel = this.initCompanyLabel();
     private JFXTimePicker startTime = new JFXTimePicker();
     private JFXTimePicker endTime = new JFXTimePicker();
-    private Label durationLabel = new Label("00:00:00");
-    private JFXDatePicker datePicker = new JFXDatePicker();
-    private MultiSelectStringView<Tag> tagsSelectInput = new MultiSelectStringView<>(Tag.values());
+    private Label durationLabel = this.initDurationLabel();
+    private JFXDatePicker datePicker = this.initDatePicker();
+    private MultiSelectStringView<Tag> tagsSelectInput = this.initTagsSelectInput();
+    private ImageView deleteButton = this.initDeleteButton();
 
     private EditableTimeEntry editableEntry;
 
     public EditWindow(TimeEntry entry, double width) {
         editableEntry = new EditableTimeEntry(entry);
 
-        closeButton.setOnMouseClicked((e) -> {
-            ImageView source = (ImageView) e.getSource();
-            JFXDrawersStack root = (JFXDrawersStack) source.getScene().getRoot();
-            GridPane mainWindow = (GridPane) root.getContent();
-            root.toggle(drawer);
-            mainWindow.setEffect(null);
-        });
-
         descriptionInput.textProperty().bindBidirectional(editableEntry.getDescriptionProperty());
-        descriptionInput.setFocusTraversable(false);
-        descriptionInput.getStyleClass().add("entry-edit-description");
-
-        projectSelectInput.setCellFactory(new ProjectCell.ProjectCellFactory());
-        ObservableList<Project> projects = FXCollections.observableArrayList(EMPTY_PROJECT);
-        projects.addAll(Cache.getInstance().getAllProjects());
-        projectSelectInput.setItems(projects);
-        projectSelectInput.getSelectionModel().selectFirst();
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
-        projectSelectInput.getStyleClass().add("entry-edit-project");
-
         companyLabel.textProperty().bind(editableEntry.getCompanyProperty());
-
         durationLabel.textProperty().bind(editableEntry.getDurationProperty());
-        durationLabel.getStyleClass().add("entry-edit-duration");
-
         startTime.valueProperty().bindBidirectional(editableEntry.getStartTimeProperty());
         endTime.valueProperty().bindBidirectional(editableEntry.getEndTimeProperty());
+        datePicker.valueProperty().bindBidirectional(editableEntry.getDateProperty());
+        tagsSelectInput.selectedItemsProperty().bindBidirectional(editableEntry.getTagsProperty());
 
+        gridPane.add(closeButton, 2, 0);
+        gridPane.add(descriptionInput, 0, 1, 3, 1);
+        gridPane.add(projectSelectInput, 0, 2, 2, 1);
+        gridPane.add(companyLabel, 2, 2);
+        gridPane.add(startTime, 0, 3);
+        gridPane.add(durationLabel, 1, 3);
+        gridPane.add(endTime, 2, 3);
+        gridPane.add(datePicker, 1, 4);
+        gridPane.add(tagsSelectInput.getComponent(), 0, 5, 3, 1);
+        gridPane.add(deleteButton, 2, 6);
+
+        gridPane.setPrefWidth(width);
+
+        drawer.setDirection(JFXDrawer.DrawerDirection.RIGHT);
+        drawer.setDefaultDrawerSize(width);
+        drawer.setSidePane(gridPane);
+        drawer.setOverLayVisible(true);
+        drawer.setOnDrawerClosed(this::onClose);
+    }
+
+    public JFXDrawer getComponent() {
+        return drawer;
+    }
+
+    private GridPane initGridPane() {
+        GridPane gridPane = new GridPane();
+
+        gridPane.setPadding(new Insets(10, 20, 10, 20));
+        gridPane.getStyleClass().add("edit-container");
+        gridPane.setVgap(GRID_GAP);
+        gridPane.setHgap(GRID_GAP);
+
+        return gridPane;
+    }
+
+    private ImageView initCloseButton() {
+        Image closeIcon =
+            new Image(this.getClass().getResourceAsStream("/cross.png"), ICON_SIZE, ICON_SIZE, true, true);
+        ImageView closeButton = new ImageView(closeIcon);
+
+        closeButton.setOnMouseClicked(e -> drawer.close());
+
+        GridPane.setHalignment(closeButton, HPos.RIGHT);
+        GridPane.setValignment(closeButton, VPos.TOP);
+        GridPane.setMargin(closeButton, new Insets(0, 0, 20, 0));
+
+        return closeButton;
+    }
+
+    private JFXTextField initDescriptionInput() {
+        JFXTextField descriptionInput = new JFXTextField();
+
+        descriptionInput.setFocusTraversable(false);
+        descriptionInput.getStyleClass().add("entry-edit-description");
+        descriptionInput.prefWidthProperty().bind(gridPane.prefWidthProperty().multiply(0.8));
+
+        GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
+
+        return descriptionInput;
+    }
+
+    private JFXComboBox<Project> initProjectSelectInput() {
+        ObservableList<Project> projects = FXCollections.observableArrayList(EMPTY_PROJECT);
+        projects.addAll(Cache.getInstance().getAllProjects());
+
+        JFXComboBox<Project> projectSelectInput = new JFXComboBox<>();
+
+        projectSelectInput.setItems(projects);
+        projectSelectInput.getSelectionModel().selectFirst();
+        projectSelectInput.getStyleClass().add("entry-edit-project");
+        projectSelectInput.setCellFactory(new ProjectCell.ProjectCellFactory());
+        projectSelectInput.prefWidthProperty().bind(gridPane.prefWidthProperty().multiply(0.75));
+
+        GridPane.setHgrow(projectSelectInput, Priority.ALWAYS);
+
+        return projectSelectInput;
+    }
+
+    private Label initCompanyLabel() {
+        Label companyLabel = new Label("No Company");
+
+        GridPane.setHgrow(companyLabel, Priority.NEVER);
+
+        return companyLabel;
+    }
+
+    private Label initDurationLabel() {
+        Label durationLabel = new Label("00:00:00");
+
+        durationLabel.getStyleClass().add("entry-edit-duration");
+
+        GridPane.setHalignment(durationLabel, HPos.CENTER);
+
+        return durationLabel;
+    }
+
+    private JFXDatePicker initDatePicker() {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        JFXDatePicker datePicker = new JFXDatePicker();
+
+        datePicker.prefWidthProperty().bind(gridPane.prefWidthProperty().multiply(0.55));
         datePicker.setConverter(new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate date) {
                 if (date == null) {
                     return null;
                 }
-                return DateTimeFormatter.ofPattern("dd.MM.yyyy").format(date);
+                return formatter.format(date);
             }
 
             @Override
@@ -88,130 +169,39 @@ public class EditWindow implements IComponent {
                 if (dateString == null || dateString.trim().isEmpty()) {
                     return null;
                 }
-                return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                return LocalDate.parse(dateString, formatter);
             }
         });
-        datePicker.valueProperty().bindBidirectional(editableEntry.getDateProperty());
 
-        tagsSelectInput.selectedItemsProperty().bindBidirectional(editableEntry.getTagsProperty());
-
-        GridPane pane = new GridPane();
-        pane.add(closeButton, 2, 0);
-        pane.add(descriptionInput, 0, 1, 3, 1);
-        pane.add(projectSelectInput, 0, 2, 2, 1);
-        pane.add(companyLabel, 2, 2);
-        pane.add(startTime, 0, 3);
-        pane.add(durationLabel, 1, 3);
-        pane.add(endTime, 2, 3);
-        pane.add(datePicker, 1, 4);
-        pane.add(tagsSelectInput.getComponent(), 0, 5, 3, 1);
-
-        pane.setPadding(new Insets(10, 20, 10, 20));
-        pane.getStyleClass().add("edit-container");
-        pane.setPrefWidth(width);
-        pane.setVgap(10);
-        pane.setHgap(10);
-
-        descriptionInput.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.8));
-        projectSelectInput.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.75));
-        datePicker.prefWidthProperty().bind(pane.prefWidthProperty().multiply(0.55));
-
-        GridPane.setHalignment(closeButton, HPos.RIGHT);
-        GridPane.setValignment(closeButton, VPos.TOP);
-        GridPane.setMargin(closeButton, new Insets(0, 0, 20, 0));
-        GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
-        GridPane.setHgrow(projectSelectInput, Priority.ALWAYS);
-        GridPane.setHgrow(companyLabel, Priority.NEVER);
-        GridPane.setHalignment(durationLabel, HPos.CENTER);
         GridPane.setHalignment(datePicker, HPos.LEFT);
+
+        return datePicker;
+    }
+
+    private MultiSelectStringView<Tag> initTagsSelectInput() {
+        MultiSelectStringView<Tag> tagsSelectInput = new MultiSelectStringView<>(Tag.values());
+
         GridPane.setVgrow(tagsSelectInput.getComponent(), Priority.ALWAYS);
 
-        drawer.setDirection(JFXDrawer.DrawerDirection.RIGHT);
-        drawer.setDefaultDrawerSize(width);
-        drawer.setSidePane(pane);
-        drawer.setOverLayVisible(false);
-        drawer.setOnDrawerClosed((e) -> {
-            JFXDrawersStack root = (JFXDrawersStack) drawer.getScene().getRoot();
-            GridPane mainWindow = (GridPane) root.getContent();
-            if (drawer.isOpened()) {
-                root.toggle(drawer);
-            }
-            mainWindow.setEffect(null);
-        });
+        return tagsSelectInput;
     }
 
-    public JFXDrawer getComponent() {
-        return drawer;
+    private ImageView initDeleteButton() {
+        Image deleteIcon = new Image(this.getClass().getResourceAsStream("/trash.png"), ICON_SIZE, ICON_SIZE, true, true);
+        ImageView deleteButton = new ImageView(deleteIcon);
+
+        // TODO define
+        // deleteButton.setOnMouseClicked(this::onClose);
+
+        GridPane.setHalignment(deleteButton, HPos.RIGHT);
+        GridPane.setValignment(deleteButton, VPos.BOTTOM);
+        GridPane.setMargin(deleteButton, new Insets(20, 0, 0, 0));
+
+        return deleteButton;
     }
 
-    public static class EditableTimeEntry {
-        @Getter
-        private SimpleStringProperty descriptionProperty = new SimpleStringProperty();
-
-        @Getter
-        private SimpleObjectProperty<Project> projectProperty = new SimpleObjectProperty<>();
-
-        @Getter
-        private SimpleStringProperty companyProperty = new SimpleStringProperty();
-
-        @Getter
-        private SimpleObjectProperty<LocalTime> startTimeProperty = new SimpleObjectProperty<>();
-
-        @Getter
-        private SimpleStringProperty durationProperty = new SimpleStringProperty();
-
-        @Getter
-        private SimpleObjectProperty<LocalTime> endTimeProperty = new SimpleObjectProperty<>();
-
-        @Getter
-        private SimpleObjectProperty<LocalDate> dateProperty = new SimpleObjectProperty<>();
-
-        @Getter
-        private SimpleListProperty<Tag> tagsProperty = new SimpleListProperty<>();
-
-        public EditableTimeEntry(TimeEntry entry) {
-            descriptionProperty.set(entry.getDescription());
-
-            if (entry.getProject() != null) {
-                projectProperty.set(entry.getProject());
-                companyProperty.set(entry.getProject().getCompanyName());
-            } else {
-                projectProperty.set(EMPTY_PROJECT);
-            }
-
-            projectProperty.addListener((o, oldValue, newValue) -> companyProperty.set(newValue.getCompanyName()));
-
-            if (entry.getStart() != null) {
-                ZonedDateTime dateTime = entry.getStart().toInstant().atZone(ZoneId.systemDefault());
-                startTimeProperty.set(dateTime.toLocalTime());
-                dateProperty.set(dateTime.toLocalDate());
-            }
-
-            if (entry.getStop() != null) {
-                ZonedDateTime dateTime = entry.getStop().toInstant().atZone(ZoneId.systemDefault());
-                endTimeProperty.set(dateTime.toLocalTime());
-            }
-
-            startTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
-            endTimeProperty.addListener((observable, oldValue, newValue) -> updateDuration());
-
-            tagsProperty.set(FXCollections.observableArrayList(entry.getTags()));
-
-            updateDuration();
-        }
-
-        public void updateDuration() {
-            LocalDateTime startDateTime = LocalDateTime.of(dateProperty.get(), startTimeProperty.get());
-            LocalDateTime endDateTime = LocalDateTime.of(dateProperty.get(), endTimeProperty.get());
-
-            Duration duration = Duration.between(startDateTime, endDateTime);
-
-            long hours = duration.toHours();
-            long minutes = duration.toMinutes() - hours * 60;
-            long seconds = duration.getSeconds() - hours * 60 * 60 - minutes * 60;
-
-            String text = String.format("%02d:%02d:%02d", hours, minutes, seconds);
-            durationProperty.set(text);
-        }
+    private void onClose(Event event) {
+        TimeEntry updatedTimeEntry = editableEntry.getUpdatedTimeEntry();
+        ToggleClient.getInstance().updateTimeEntry(updatedTimeEntry);
     }
 }

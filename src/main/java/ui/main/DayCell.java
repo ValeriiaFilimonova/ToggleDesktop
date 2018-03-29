@@ -24,6 +24,7 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
         } else {
             entriesList.updateLabelText();
             entriesList.setPrefHeight(40.5 * entriesList.getItems().size()); // TODO get rid of magic number
+
             super.updateItem(entriesList, empty);
 
             entriesList.setOnMouseClicked((MouseEvent e) -> {
@@ -31,12 +32,6 @@ public class DayCell extends JFXListCell<EntriesListComponent> {
                 TimeEntry selectedEntry = entriesList.getSelectionModel().getSelectedItem();
                 EditWindow editWindow = new EditWindow(selectedEntry, window.getWidth() * 0.8);
                 JFXDrawersStack drawersStack = (JFXDrawersStack) entriesList.getScene().getRoot();
-
-                ColorAdjust blurEffect = new ColorAdjust(0, -0.5, -0.3, 0);
-                blurEffect.setInput(new GaussianBlur());
-
-                GridPane mainWindow = (GridPane) drawersStack.getContent();
-                mainWindow.setEffect(blurEffect);
 
                 drawersStack.toggle(editWindow.getComponent());
             });

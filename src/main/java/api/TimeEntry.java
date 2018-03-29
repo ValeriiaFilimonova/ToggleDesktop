@@ -17,13 +17,13 @@ import org.apache.commons.lang3.time.DateUtils;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeEntry implements Comparable<TimeEntry> {
+public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     public final static String SHORT_DATE_FORMAT = "yyyy-MM-dd";
 
     @Getter @Setter
     private String id;
 
-    @Setter
+    @Getter @Setter
     private String pid;
 
     @Setter
@@ -95,6 +95,11 @@ public class TimeEntry implements Comparable<TimeEntry> {
         int hours = durationInMinutes / 60;
         int minutes = durationInMinutes - hours * 60;
         return String.format("%dh %02dmin", hours, minutes);
+    }
+
+    @SneakyThrows
+    public TimeEntry clone() {
+        return (TimeEntry) super.clone();
     }
 
     @Data
