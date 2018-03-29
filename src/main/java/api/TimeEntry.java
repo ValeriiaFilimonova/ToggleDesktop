@@ -19,6 +19,7 @@ import org.apache.commons.lang3.time.DateUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     public final static String SHORT_DATE_FORMAT = "yyyy-MM-dd";
+    public final static String FULL_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
     @Getter @Setter
     private String id;
@@ -72,6 +73,11 @@ public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     @JsonIgnore
     public String getDate() {
         return new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).format(start);
+    }
+
+    @JsonIgnore
+    public String getFullDate() {
+        return new SimpleDateFormat(TimeEntry.FULL_DATE_FORMAT).format(start);
     }
 
     @JsonIgnore

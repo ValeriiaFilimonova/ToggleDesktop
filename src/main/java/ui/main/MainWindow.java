@@ -14,39 +14,65 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import reports.ReportBuilder;
+import ui.reports.ReportErrorsWindow;
 
 public class MainWindow {
     private static int DEFAULT_DAYS_COUNT = 3;
 
-    private Scene scene;
     private RunningTimeEntryComponent runningTimeEntryComponent = this.initRunningEntryComponent();
     private DaysListComponent daysListComponent = new DaysListComponent();
+
+    private Scene scene;
+    private GridPane mainContainer = new GridPane();
     private JFXButton showMoreButton = new JFXButton("Show more");
+    private Image exportIcon = new Image(this.getClass().getResourceAsStream("/export.png"), 30, 30, true, true);
+    private JFXButton exportButton = new JFXButton(null, new ImageView(exportIcon));
 
     public MainWindow() {
-        GridPane mainContainer = new GridPane();
-
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
-        GridPane runningTimeEntry = runningTimeEntryComponent.getComponent();
-        GridPane.setVgrow(runningTimeEntry, Priority.NEVER);
-        GridPane.setHgrow(runningTimeEntry, Priority.ALWAYS);
+        GridPane.setVgrow(runningTimeEntryComponent.getComponent(), Priority.NEVER);
+        GridPane.setHgrow(runningTimeEntryComponent.getComponent(), Priority.ALWAYS);
 
-        mainContainer.add(runningTimeEntry, 0, 0);
-        mainContainer.add(daysListComponent.getComponent(), 0, 1);
         GridPane.setVgrow(daysListComponent.getComponent(), Priority.ALWAYS);
+        GridPane.setHgrow(daysListComponent.getComponent(), Priority.ALWAYS);
 
         showMoreButton.setVisible(false);
         showMoreButton.getStyleClass().add("show-more-button");
         showMoreButton.setOnAction((event) -> this.getMoreEntries(daysListComponent.getEarliestDate()));
-        mainContainer.add(showMoreButton, 0, 2);
         GridPane.setVgrow(showMoreButton, Priority.NEVER);
-        GridPane.setHalignment(showMoreButton, HPos.CENTER);
+        GridPane.setHgrow(showMoreButton, Priority.ALWAYS);
+        GridPane.setHalignment(showMoreButton, HPos.LEFT);
 
+        exportButton.getStyleClass().add("export-button");
+        exportButton.setOnAction((event) -> {
+            try {
+                ReportBuilder.build();
+            } catch (ReportBuilder.BuildReportException exception) {
+                ReportErrorsWindow errorsWindow = new ReportErrorsWindow(exception.getErrors(), 250);
+                JFXDrawersStack drawersStack = (JFXDrawersStack) getScene().getRoot();
+                drawersStack.toggle(errorsWindow.getComponent());
+            }
+        });
+
+        ColumnConstraints column1 = new ColumnConstraints();
+        column1.setPercentWidth(40);
+        ColumnConstraints column2 = new ColumnConstraints();
+        column2.setPercentWidth(60);
+
+        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 2, 1);
+        mainContainer.add(daysListComponent.getComponent(), 0, 1, 2, 1);
+        mainContainer.add(exportButton, 0, 2);
+        mainContainer.add(showMoreButton, 1, 2);
         mainContainer.getStyleClass().add("main-window");
+        mainContainer.getColumnConstraints().addAll(column1, column2);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
         drawersStack.setContent(mainContainer);
@@ -86,7 +112,7 @@ public class MainWindow {
     @SneakyThrows
     private void getMoreEntries(String dateString) {
         Date date = new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString);
-        LoadService service = new LoadService(date,DEFAULT_DAYS_COUNT + 2);
+        LoadService service = new LoadService(date, DEFAULT_DAYS_COUNT + 2);
         service.setOnSucceeded(t -> {
             List<TimeEntry> timeEntries = (List<TimeEntry>) t.getSource().getValue();
             if (timeEntries.size() == 0) {

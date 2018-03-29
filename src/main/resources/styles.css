@@ -17,7 +17,7 @@
 
 .scroll-bar:vertical .increment-button,
 .scroll-bar:vertical .decrement-button,
-.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .increment-button,
 .scroll-bar:horizontal .decrement-button {
     -fx-background-color: rgb(245, 245, 245);
     -fx-background-radius: 0em;
@@ -52,6 +52,14 @@
     -fx-text-fill: lightslategray;
     -fx-font-weight: bold;
     -fx-background-color: transparent;
+}
+
+.main-window .export-button {
+    -fx-background-color: transparent;
+}
+
+.main-window .export-button .jfx-rippler {
+    -jfx-rippler-fill: lightslategray;
 }
 
 .running-entry-container {
@@ -222,4 +230,14 @@
 .multi-select-list .suggestion-item:selected {
     -fx-background-color: lightgray;
     -fx-text-fill: black;
+}
+
+/* Errors window */
+
+.report-errors-container {
+    -fx-font-size: 14px;
+}
+
+.report-errors-container .report-error-label {
+    -fx-text-fill: darkred;
 }

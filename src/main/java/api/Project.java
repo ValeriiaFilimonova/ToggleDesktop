@@ -12,7 +12,7 @@ public class Project {
     @Getter @Setter
     private String id;
 
-    @Setter
+    @Getter @Setter
     private String cid;
 
     @Setter
