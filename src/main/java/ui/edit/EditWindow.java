@@ -1,10 +1,18 @@
 package ui.edit;
 
-import com.jfoenix.controls.*;
+import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXTimePicker;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.BreakIterator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 
 import api.*;
@@ -14,13 +22,21 @@ import javafx.event.Event;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.RowConstraints;
 import javafx.util.StringConverter;
+import lombok.Setter;
+import org.fxmisc.richtext.StyleClassedTextArea;
+import org.fxmisc.richtext.model.RichTextChange;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpansBuilder;
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.BritishEnglish;
+import org.languagetool.rules.RuleMatch;
 import ui.IComponent;
 
 public class EditWindow implements IComponent {
@@ -32,7 +48,7 @@ public class EditWindow implements IComponent {
     private JFXDrawer drawer = new JFXDrawer();
     private GridPane gridPane = this.initGridPane();
     private ImageView closeButton = this.initCloseButton();
-    private JFXTextField descriptionInput = this.initDescriptionInput();
+    private StyleClassedTextArea descriptionInput = this.initDescriptionInput();
     private JFXComboBox<Project> projectSelectInput = this.initProjectSelectInput();
     private Label companyLabel = this.initCompanyLabel();
     private JFXTimePicker startTime = new JFXTimePicker();
@@ -43,15 +59,39 @@ public class EditWindow implements IComponent {
     private ImageView deleteButton = this.initDeleteButton();
 
     private EditableTimeEntry editableEntry;
+    @Setter
     private Consumer<TimeEntry> onUpdateListener;
+    @Setter
     private Consumer<TimeEntry> onDeleteListener;
+
+    private JLanguageTool languageTool = new JLanguageTool(new BritishEnglish());
 
     public EditWindow(TimeEntry entry, double width) {
         editableEntry = new EditableTimeEntry(entry);
 
         // bind properties
 
-        descriptionInput.textProperty().bindBidirectional(editableEntry.getDescriptionProperty());
+        descriptionInput.replaceText(0, 0, entry.getDescription());
+        descriptionInput.textProperty().addListener((obs, oldValue, newValue) -> {
+            editableEntry.getDescriptionProperty().setValue(newValue);
+
+            try {
+                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+                    spansBuilder.add(Collections.singleton("underlined"), end - start);
+                List<RuleMatch> matches = languageTool.check(newValue);
+                matches.forEach(match -> {
+                    int start = match.getFromPos();
+                    int end = match.getToPos();
+
+                    System.out.println(String.format("Error %d-%d: %s", start, end, newValue.substring(start, end)));
+
+
+                    StyleSpans<Collection<String>> spans = spansBuilder.create();
+                    descriptionInput.setStyleSpans(0, spans);
+                });
+            } catch (IOException e) {
+            }
+        });
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
         companyLabel.textProperty().bind(editableEntry.getCompanyProperty());
         durationLabel.textProperty().bind(editableEntry.getDurationProperty());
@@ -73,7 +113,12 @@ public class EditWindow implements IComponent {
         gridPane.add(tagsSelectInput.getComponent(), 0, 5, 3, 1);
         gridPane.add(deleteButton, 2, 6);
 
+        RowConstraints descriptionRow = new RowConstraints() {{
+            setPercentHeight(30);
+        }};
+
         gridPane.setPrefWidth(width);
+        gridPane.getRowConstraints().addAll(new RowConstraints(), descriptionRow);
 
         // init drawer
 
@@ -86,14 +131,6 @@ public class EditWindow implements IComponent {
 
     public JFXDrawer getComponent() {
         return drawer;
-    }
-
-    public void setOnUpdateListener(Consumer<TimeEntry> onUpdateListener) {
-        this.onUpdateListener = onUpdateListener;
-    }
-
-    public void setOnDeleteListener(Consumer<TimeEntry> onDeleteListener) {
-        this.onDeleteListener = onDeleteListener;
     }
 
     private GridPane initGridPane() {
@@ -121,12 +158,12 @@ public class EditWindow implements IComponent {
         return closeButton;
     }
 
-    private JFXTextField initDescriptionInput() {
-        JFXTextField descriptionInput = new JFXTextField();
+    private StyleClassedTextArea initDescriptionInput() {
+        StyleClassedTextArea descriptionInput = new StyleClassedTextArea();
 
-        descriptionInput.setFocusTraversable(false);
+        descriptionInput.setWrapText(true);
+        descriptionInput.setFocusTraversable(true);
         descriptionInput.getStyleClass().add("entry-edit-description");
-        descriptionInput.prefWidthProperty().bind(gridPane.prefWidthProperty().multiply(0.8));
 
         GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
 
@@ -236,5 +273,14 @@ public class EditWindow implements IComponent {
                 onUpdateListener.accept(entryToUpdate);
             }
         }
+    }
+
+    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+
+        //        spansBuilder.add(Collections.emptyList(), firstIndex - lastKwEnd);
+        //        spansBuilder.add(Collections.singleton("underlined"), lastIndex - firstIndex);
+
+        return spansBuilder.create();
     }
 }
