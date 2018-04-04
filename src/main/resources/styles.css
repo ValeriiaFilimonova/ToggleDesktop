@@ -241,3 +241,7 @@
 .report-errors-container .report-error-label {
     -fx-text-fill: darkred;
 }
+
+.red-text {
+    -fx-background-color: lightcoral;
+}
