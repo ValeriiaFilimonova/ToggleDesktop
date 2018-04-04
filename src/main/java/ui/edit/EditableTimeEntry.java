@@ -98,7 +98,7 @@ class EditableTimeEntry {
     public TimeEntry getUpdatedTimeEntry() {
         TimeEntry newEntry = originalEntry.clone();
 
-        newEntry.setDescription(descriptionProperty.get());
+        newEntry.setDescription(descriptionProperty.get().replaceAll("(\\r|\\n)", " "));
         newEntry.setTags(tagsProperty.get().toArray(new Tag[] {}));
         newEntry.setStart(getDate(dateProperty.get(), startTimeProperty.get()));
         newEntry.setStop(getDate(dateProperty.get(), endTimeProperty.get()));
