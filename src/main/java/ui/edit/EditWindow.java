@@ -7,15 +7,17 @@ import com.jfoenix.controls.JFXTimePicker;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.BreakIterator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import api.*;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -28,10 +30,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.Setter;
+import net.loomchild.segment.util.IORuntimeException;
 import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.model.RichTextChange;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
 import org.languagetool.JLanguageTool;
@@ -60,11 +63,48 @@ public class EditWindow implements IComponent {
 
     private EditableTimeEntry editableEntry;
     @Setter
-    private Consumer<TimeEntry> onUpdateListener;
+    private BiConsumer<TimeEntry, TimeEntry> onUpdateListener;
     @Setter
     private Consumer<TimeEntry> onDeleteListener;
 
     private JLanguageTool languageTool = new JLanguageTool(new BritishEnglish());
+
+    private int inputChangeCounter = 0;
+    private int spellCheckCounter = 0;
+
+    private KeyFrame spellCheckFrame = new KeyFrame(Duration.seconds(5), (event) -> {
+        if (inputChangeCounter != spellCheckCounter) {
+            spellCheckCounter = inputChangeCounter;
+            try {
+                String text = editableEntry.getDescriptionProperty().getValue();
+                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+                List<RuleMatch> matches = languageTool.check(text);
+                int lastChecked = 0;
+
+                for (RuleMatch match : matches) {
+                    int start = match.getFromPos();
+                    int end = match.getToPos();
+
+                    spansBuilder.add(Collections.emptyList(), start - lastChecked);
+                    spansBuilder.add(Collections.singleton("underlined"), end - start);
+                    lastChecked = end;
+
+                    System.out.println(String.format("Error %d-%d: %s", start, end, text.substring(start, end)));
+                }
+
+                if (lastChecked != text.length()) {
+                    spansBuilder.add(Collections.emptyList(), text.length() - lastChecked);
+                }
+
+                StyleSpans<Collection<String>> spans = spansBuilder.create();
+                descriptionInput.setStyleSpans(0, spans);
+            } catch (IOException e) {
+                throw new IORuntimeException(e);
+            }
+        }
+    });
+
+    private Timeline timeline = new Timeline(spellCheckFrame);
 
     public EditWindow(TimeEntry entry, double width) {
         editableEntry = new EditableTimeEntry(entry);
@@ -74,23 +114,7 @@ public class EditWindow implements IComponent {
         descriptionInput.replaceText(0, 0, entry.getDescription());
         descriptionInput.textProperty().addListener((obs, oldValue, newValue) -> {
             editableEntry.getDescriptionProperty().setValue(newValue);
-
-            try {
-                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-                    spansBuilder.add(Collections.singleton("underlined"), end - start);
-                List<RuleMatch> matches = languageTool.check(newValue);
-                matches.forEach(match -> {
-                    int start = match.getFromPos();
-                    int end = match.getToPos();
-
-                    System.out.println(String.format("Error %d-%d: %s", start, end, newValue.substring(start, end)));
-
-
-                    StyleSpans<Collection<String>> spans = spansBuilder.create();
-                    descriptionInput.setStyleSpans(0, spans);
-                });
-            } catch (IOException e) {
-            }
+            inputChangeCounter++;
         });
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
         companyLabel.textProperty().bind(editableEntry.getCompanyProperty());
@@ -127,6 +151,9 @@ public class EditWindow implements IComponent {
         drawer.setSidePane(gridPane);
         drawer.setOverLayVisible(true);
         drawer.setOnDrawerClosed(this::onClose);
+
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
     }
 
     public JFXDrawer getComponent() {
@@ -270,17 +297,10 @@ public class EditWindow implements IComponent {
             TimeEntry entryToUpdate = ToggleClient.getInstance().updateTimeEntry(updatedEntry);
 
             if (onUpdateListener != null) {
-                onUpdateListener.accept(entryToUpdate);
+                onUpdateListener.accept(editableEntry.getOriginalEntry(), entryToUpdate);
             }
         }
-    }
 
-    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
-        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-
-        //        spansBuilder.add(Collections.emptyList(), firstIndex - lastKwEnd);
-        //        spansBuilder.add(Collections.singleton("underlined"), lastIndex - firstIndex);
-
-        return spansBuilder.create();
+        timeline.stop();
     }
 }

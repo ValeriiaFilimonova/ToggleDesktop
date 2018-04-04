@@ -37,9 +37,9 @@ public class DaysListComponent implements IComponent {
         this.list.refresh();
     }
 
-    public void updateItem(TimeEntry timeEntry) {
-        removeEntryFromSubList(timeEntry);
-        addEntryToSubList(timeEntry);
+    public void updateItem(TimeEntry oldTimeEntry, TimeEntry newTimeEntry) {
+        removeEntryFromSubList(oldTimeEntry);
+        addEntryToSubList(newTimeEntry);
         this.list.refresh();
     }
 
