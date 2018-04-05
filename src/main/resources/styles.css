@@ -156,9 +156,15 @@
 }
 
 .edit-container .entry-edit-description {
-    -jfx-focus-color: rgb(0, 150, 130);
     -fx-background-color: white;
     -fx-padding: 7px;
+    -fx-highlight-fill: lightgray;
+}
+
+.edit-container .entry-edit-description:focused {
+    -fx-border-color: rgb(0, 150, 130);
+    -fx-border-width: 0 0 2 0;
+    -fx-highlight-fill: lightgray;
 }
 
 .edit-container .entry-edit-project {
@@ -195,7 +201,15 @@
     -fx-padding: 2px 0px 2px 7px;
 }
 
-.project-cell {
+.edit-container .spell-error {
+    -fx-border-width: 0 0 2 0;
+    -fx-padding: 0 0 -1 0;
+    -fx-underline: true;
+    -fx-font-weight: bold;
+    -fx-fill: lightcoral;
+}
+
+.edit-container .project-cell {
     -fx-background-color: white;
 }
 
@@ -240,8 +254,4 @@
 
 .report-errors-container .report-error-label {
     -fx-text-fill: darkred;
-}
-
-.red-text {
-    -fx-background-color: lightcoral;
 }
