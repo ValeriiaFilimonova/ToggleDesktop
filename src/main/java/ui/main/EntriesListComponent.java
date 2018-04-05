@@ -14,22 +14,26 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.DateUtils;
 
 public class EntriesListComponent extends JFXListView<TimeEntry> {
     private static String LABEL_DATE_FORMAT = "EEE, d MMM";
 
+    private HBox groupNode;
     private Label durationLabel = new Label("");
+    private Label warningLabel = new Label("!!");
     private ObservableList<TimeEntry> items = FXCollections.observableArrayList();
     private Date date;
     private int sumDuration = 0;
+    @Getter
+    private int entriesWithErrorsCount = 0;
 
     @SneakyThrows
     public EntriesListComponent(String dateString) {
         date = new SimpleDateFormat(TimeEntry.SHORT_DATE_FORMAT).parse(dateString);
-
-        HBox groupNode = getGroupNode();
+        groupNode = initGroupNode();
 
         setId(dateString);
         setItems(items);
@@ -48,12 +52,25 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
     public void addEntry(TimeEntry entry) {
         sumDuration += entry.getDuration();
 
+        if (entry.hasSpellingErrors()) {
+            entriesWithErrorsCount++;
+            warningLabel.setVisible(true);
+        }
+
         items.add(entry);
         items.sort((entry1, entry2) -> entry2.compareTo(entry1));
     }
 
     public void removeEntry(TimeEntry entry) {
         sumDuration -= entry.getDuration();
+
+        if (entry.hasSpellingErrors()) {
+            entriesWithErrorsCount--;
+            if (entriesWithErrorsCount == 0) {
+                warningLabel.setVisible(false);
+            }
+        }
+
         items.remove(entry);
     }
 
@@ -61,14 +78,16 @@ public class EntriesListComponent extends JFXListView<TimeEntry> {
         durationLabel.setText(TimeEntry.formatDuration(sumDuration));
     }
 
-    private HBox getGroupNode() {
+    private HBox initGroupNode() {
         Label dayLabel = new Label(getDateText());
         dayLabel.getStyleClass().add("entries-list-header-day");
         dayLabel.setPadding(new Insets(0, 10, 0, 10));
 
         durationLabel.getStyleClass().add("entries-list-header-duration");
+        warningLabel.getStyleClass().add("entries-list-header-warning");
+        warningLabel.setVisible(false);
 
-        HBox container = new HBox(dayLabel, durationLabel);
+        HBox container = new HBox(dayLabel, durationLabel, warningLabel);
         container.getStyleClass().add("entries-list-header");
         return container;
     }

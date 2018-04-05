@@ -51,6 +51,10 @@ public class TimeEntryCell extends ListCell<TimeEntry> {
         Label descriptionLabel = new Label(item.getDescription());
         descriptionLabel.getStyleClass().add("time-entry-description");
 
+        if (item.hasSpellingErrors()) {
+            descriptionLabel.getStyleClass().add("time-entry-description-with-errors");
+        }
+
         StackPane descriptionPane = new StackPane();
         descriptionPane.setMinWidth(0);
         descriptionPane.setPrefWidth(1);
