@@ -70,13 +70,17 @@ public class EditWindow implements IComponent {
     private JLanguageTool languageTool = new JLanguageTool(new BritishEnglish());
 
     private int inputChangeCounter = 0;
-    private int spellCheckCounter = 0;
+    private int spellCheckCounter = -1;
 
     private KeyFrame spellCheckFrame = new KeyFrame(Duration.seconds(5), (event) -> {
         if (inputChangeCounter != spellCheckCounter) {
             spellCheckCounter = inputChangeCounter;
             try {
                 String text = editableEntry.getDescriptionProperty().getValue();
+                if (text.length() == 0) {
+                    return;
+                }
+
                 StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
                 List<RuleMatch> matches = languageTool.check(text);
                 int lastChecked = 0;
@@ -86,7 +90,7 @@ public class EditWindow implements IComponent {
                     int end = match.getToPos();
 
                     spansBuilder.add(Collections.emptyList(), start - lastChecked);
-                    spansBuilder.add(Collections.singleton("underlined"), end - start);
+                    spansBuilder.add(Collections.singleton("spell-error"), end - start);
                     lastChecked = end;
 
                     System.out.println(String.format("Error %d-%d: %s", start, end, text.substring(start, end)));
@@ -191,6 +195,7 @@ public class EditWindow implements IComponent {
         descriptionInput.setWrapText(true);
         descriptionInput.setFocusTraversable(true);
         descriptionInput.getStyleClass().add("entry-edit-description");
+        descriptionInput.requestFocus();
 
         GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
 
