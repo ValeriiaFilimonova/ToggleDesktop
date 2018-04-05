@@ -113,6 +113,11 @@
     -fx-font-weight: bold;
 }
 
+.entries-list-header-warning {
+    -fx-text-fill: lightcoral;
+    -fx-font-weight: bold;
+}
+
 .entries-list {
     -fx-background-color: transparent;
     -fx-effect: none;
@@ -120,6 +125,10 @@
 
 .time-entry-list-cell {
     -fx-background-color: white;
+}
+
+.time-entry-description-with-errors {
+    -fx-background-color: lightcoral;
 }
 
 .time-entry-list-cell:selected {

@@ -5,7 +5,6 @@ import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXDrawer;
 import com.jfoenix.controls.JFXTimePicker;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +32,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.Setter;
-import net.loomchild.segment.util.IORuntimeException;
+import lombok.SneakyThrows;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.model.StyleSpans;
 import org.fxmisc.richtext.model.StyleSpansBuilder;
@@ -75,35 +74,12 @@ public class EditWindow implements IComponent {
     private KeyFrame spellCheckFrame = new KeyFrame(Duration.seconds(5), (event) -> {
         if (inputChangeCounter != spellCheckCounter) {
             spellCheckCounter = inputChangeCounter;
-            try {
-                String text = editableEntry.getDescriptionProperty().getValue();
-                if (text.length() == 0) {
-                    return;
-                }
 
-                StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
-                List<RuleMatch> matches = languageTool.check(text);
-                int lastChecked = 0;
+            String text = editableEntry.getDescriptionProperty().getValue();
+            StyleSpans<Collection<String>> styleSpans = buildStyleSpans(text);
 
-                for (RuleMatch match : matches) {
-                    int start = match.getFromPos();
-                    int end = match.getToPos();
-
-                    spansBuilder.add(Collections.emptyList(), start - lastChecked);
-                    spansBuilder.add(Collections.singleton("spell-error"), end - start);
-                    lastChecked = end;
-
-                    System.out.println(String.format("Error %d-%d: %s", start, end, text.substring(start, end)));
-                }
-
-                if (lastChecked != text.length()) {
-                    spansBuilder.add(Collections.emptyList(), text.length() - lastChecked);
-                }
-
-                StyleSpans<Collection<String>> spans = spansBuilder.create();
-                descriptionInput.setStyleSpans(0, spans);
-            } catch (IOException e) {
-                throw new IORuntimeException(e);
+            if (styleSpans != null) {
+                descriptionInput.setStyleSpans(0, styleSpans);
             }
         }
     });
@@ -116,10 +92,12 @@ public class EditWindow implements IComponent {
         // bind properties
 
         descriptionInput.replaceText(0, 0, entry.getDescription());
-        descriptionInput.textProperty().addListener((obs, oldValue, newValue) -> {
-            editableEntry.getDescriptionProperty().setValue(newValue);
-            inputChangeCounter++;
-        });
+        StyleSpans<Collection<String>> styleSpans = buildStyleSpans(entry.getDescription());
+
+        if (styleSpans != null) {
+            descriptionInput.setStyleSpans(0, styleSpans);
+        }
+
         projectSelectInput.valueProperty().bindBidirectional(editableEntry.getProjectProperty());
         companyLabel.textProperty().bind(editableEntry.getCompanyProperty());
         durationLabel.textProperty().bind(editableEntry.getDurationProperty());
@@ -195,7 +173,10 @@ public class EditWindow implements IComponent {
         descriptionInput.setWrapText(true);
         descriptionInput.setFocusTraversable(true);
         descriptionInput.getStyleClass().add("entry-edit-description");
-        descriptionInput.requestFocus();
+        descriptionInput.textProperty().addListener((obs, oldValue, newValue) -> {
+            editableEntry.getDescriptionProperty().setValue(newValue);
+            inputChangeCounter++;
+        });
 
         GridPane.setHgrow(descriptionInput, Priority.ALWAYS);
 
@@ -307,5 +288,34 @@ public class EditWindow implements IComponent {
         }
 
         timeline.stop();
+    }
+
+    @SneakyThrows
+    private StyleSpans<Collection<String>> buildStyleSpans(String text) {
+        if (text.length() == 0) {
+            return null;
+        }
+
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        List<RuleMatch> matches = languageTool.check(text);
+        int lastChecked = 0;
+
+        for (RuleMatch match : matches) {
+            int start = match.getFromPos();
+            int end = match.getToPos();
+
+            spansBuilder.add(Collections.emptyList(), start - lastChecked);
+            spansBuilder.add(Collections.singleton("spell-error"), end - start);
+            lastChecked = end;
+
+            System.out.println(
+                String.format("Error %d-%d: %s - %s", start, end, text.substring(start, end), match.getMessage()));
+        }
+
+        if (lastChecked != text.length()) {
+            spansBuilder.add(Collections.emptyList(), text.length() - lastChecked);
+        }
+
+        return spansBuilder.create();
     }
 }

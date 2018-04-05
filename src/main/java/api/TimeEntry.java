@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Calendar;
+import java.util.Date;
 
 import lombok.*;
 import org.apache.commons.lang3.time.DateUtils;
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.BritishEnglish;
 
 @Builder
 @RequiredArgsConstructor
@@ -46,6 +48,9 @@ public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
 
     @Getter @Setter
     private String created_with;
+
+    @JsonIgnore
+    private Boolean hasSpellingErrors = null;
 
     public String getDescription() {
         if (description == null) {
@@ -83,6 +88,21 @@ public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     @JsonIgnore
     public boolean todaysEntry() {
         return DateUtils.isSameDay(start, Calendar.getInstance().getTime());
+    }
+
+    @JsonIgnore
+    @SneakyThrows
+    public boolean hasSpellingErrors() {
+        if (description == null) {
+            return false;
+        }
+
+        if (hasSpellingErrors == null) {
+            JLanguageTool languageTool = new JLanguageTool(new BritishEnglish());
+            hasSpellingErrors = !languageTool.check(description).isEmpty();
+        }
+
+        return hasSpellingErrors;
     }
 
     @Override
