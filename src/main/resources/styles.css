@@ -54,11 +54,13 @@
     -fx-background-color: transparent;
 }
 
-.main-window .export-button {
+.main-window .export-button,
+.main-window .settings-button {
     -fx-background-color: transparent;
 }
 
-.main-window .export-button .jfx-rippler {
+.main-window .export-button .jfx-rippler,
+.main-window .settings-button .jfx-rippler {
     -jfx-rippler-fill: lightslategray;
 }
 
@@ -240,4 +242,10 @@
 
 .report-errors-container .report-error-label {
     -fx-text-fill: darkred;
+}
+
+.report-header-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-border-width: 0 0 1px 0;
 }

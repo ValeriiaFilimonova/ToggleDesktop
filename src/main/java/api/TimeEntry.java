@@ -3,7 +3,6 @@ package api;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -15,7 +14,6 @@ import org.apache.commons.lang3.time.DateUtils;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     public final static String SHORT_DATE_FORMAT = "yyyy-MM-dd";
