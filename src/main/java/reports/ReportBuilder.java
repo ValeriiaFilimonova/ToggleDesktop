@@ -56,7 +56,7 @@ public class ReportBuilder implements AutoCloseable {
     @SneakyThrows
     private void prepareRows() {
         ToggleClient toggleClient = ToggleClient.getInstance();
-        List<TimeEntry> timeEntries = toggleClient.getMonthTimeEntries();
+        List<TimeEntry> timeEntries = toggleClient.getTimeEntriesForMonth();
 
         for (TimeEntry entry : timeEntries) {
             try {
