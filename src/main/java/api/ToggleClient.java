@@ -10,8 +10,10 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import lombok.NonNull;
@@ -30,7 +32,7 @@ public class ToggleClient {
     private final static String PROJECTS_PATH = "projects/";
     private final static String COMPANIES_PATH = "clients/";
 
-    private SimpleDateFormat dateFormatter = new SimpleDateFormat(DATE_FORMAT);
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -97,18 +99,17 @@ public class ToggleClient {
         return validateResponse(response).getEntity(TimeEntry.TimeEntryResponseData.class).getData();
     }
 
-    public List<TimeEntry> getTimeEntriesBeforeDate(Date endDate, int count) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(endDate);
-        calendar.add(Calendar.DATE, -count);
-        calendar.set(Calendar.HOUR, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
+    public List<TimeEntry> getTimeEntriesBeforeDate(Date endDate, int days) {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant endDateInstant = endDate.toInstant();
+        LocalDate endLocalDate = endDateInstant.atZone(zone).toLocalDate();
+        ZonedDateTime startDateTime = ZonedDateTime.of(endLocalDate, LocalTime.MIN, zone).minusDays(days);
+        ZonedDateTime endDateTime = ZonedDateTime.ofInstant(endDateInstant, zone);
 
         WebResource resource = jerseyClient
             .resource(API_URL + TIME_ENTRIES_PATH)
-            .queryParam("start_date", dateFormatter.format(calendar.getTime()))
-            .queryParam("end_date", dateFormatter.format(endDate));
+            .queryParam("start_date", dateTimeFormatter.format(startDateTime))
+            .queryParam("end_date", dateTimeFormatter.format(endDateTime));
         ClientResponse response = resource
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .get(ClientResponse.class);
@@ -116,21 +117,17 @@ public class ToggleClient {
         return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
     }
 
-    public List<TimeEntry> getMonthTimeEntries() {
+    public List<TimeEntry> getTimeEntriesForMonth() {
+        LocalDate localDate = LocalDate.now().withDayOfMonth(1);
+        ZonedDateTime dateTime = ZonedDateTime.of(localDate, LocalTime.MIN, ZoneId.systemDefault());
+
         WebResource resource = jerseyClient
             .resource(API_URL + TIME_ENTRIES_PATH)
-            .queryParam("start_date", getMonthDateString());
+            .queryParam("start_date", dateTimeFormatter.format(dateTime));
         ClientResponse response = resource
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .get(ClientResponse.class);
         return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
-    }
-
-    private String getMonthDateString() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-
-        return dateFormatter.format(calendar.getTime());
     }
 
     private ClientResponse validateResponse(ClientResponse response) {
