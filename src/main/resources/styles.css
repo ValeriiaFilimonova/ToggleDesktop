@@ -54,11 +54,13 @@
     -fx-background-color: transparent;
 }
 
-.main-window .export-button {
+.main-window .export-button,
+.main-window .collapse-button {
     -fx-background-color: transparent;
 }
 
-.main-window .export-button .jfx-rippler {
+.main-window .export-button .jfx-rippler,
+.main-window .collapse-button .jfx-rippler {
     -jfx-rippler-fill: lightslategray;
 }
 

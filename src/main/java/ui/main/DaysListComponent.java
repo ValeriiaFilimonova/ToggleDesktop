@@ -32,6 +32,14 @@ public class DaysListComponent implements IComponent {
         return this.list;
     }
 
+    public void collapse() {
+        for (EntriesListComponent item : items) {
+            item.setExpanded(false);
+        }
+        // TODO find a way to refresh all items
+        this.list.refresh();
+    }
+
     public void addItem(TimeEntry timeEntry) {
         addEntryToSubList(timeEntry);
         this.list.refresh();
@@ -74,6 +82,7 @@ public class DaysListComponent implements IComponent {
         } else {
             // TODO temp
             if (timeEntry.todaysEntry()) {
+                items.forEach(EntriesListComponent::updateGroupNodeLabel);
                 items.add(0, new EntriesListComponent(timeEntry));
             } else {
                 items.add(new EntriesListComponent(timeEntry));

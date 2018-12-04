@@ -14,9 +14,9 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import lombok.AllArgsConstructor;
@@ -35,6 +35,8 @@ public class MainWindow {
     private JFXButton showMoreButton = new JFXButton("Show more");
     private Image exportIcon = new Image(this.getClass().getResourceAsStream("/export.png"), 30, 30, true, true);
     private JFXButton exportButton = new JFXButton(null, new ImageView(exportIcon));
+    private Image collapseAllIcon = new Image(this.getClass().getResourceAsStream("/collapse.png"), 30, 30, true, true);
+    private JFXButton collapseAllButton = new JFXButton(null, new ImageView(collapseAllIcon));
 
     public MainWindow() {
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
@@ -49,9 +51,10 @@ public class MainWindow {
         showMoreButton.setOnAction((event) -> this.getMoreEntries(daysListComponent.getEarliestDate()));
         GridPane.setVgrow(showMoreButton, Priority.NEVER);
         GridPane.setHgrow(showMoreButton, Priority.ALWAYS);
-        GridPane.setHalignment(showMoreButton, HPos.LEFT);
+        GridPane.setHalignment(showMoreButton, HPos.CENTER);
 
         exportButton.getStyleClass().add("export-button");
+        exportButton.setTooltip(new Tooltip("Export monthly report"));
         exportButton.setOnAction((event) -> {
             try {
                 ReportBuilder.build();
@@ -62,17 +65,18 @@ public class MainWindow {
             }
         });
 
-        ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(40);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(60);
+        collapseAllButton.getStyleClass().add("collapse-button");
+        collapseAllButton.setTooltip(new Tooltip("Collapse all lists"));
+        collapseAllButton.setOnAction((event) -> {
+            daysListComponent.collapse();
+        });
 
-        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 2, 1);
-        mainContainer.add(daysListComponent.getComponent(), 0, 1, 2, 1);
+        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 3, 1);
+        mainContainer.add(daysListComponent.getComponent(), 0, 1, 3, 1);
         mainContainer.add(exportButton, 0, 2);
         mainContainer.add(showMoreButton, 1, 2);
+        mainContainer.add(collapseAllButton, 2, 2);
         mainContainer.getStyleClass().add("main-window");
-        mainContainer.getColumnConstraints().addAll(column1, column2);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
         drawersStack.setContent(mainContainer);
