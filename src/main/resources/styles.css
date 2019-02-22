@@ -42,6 +42,14 @@
     -fx-background-insets: 0em;
 }
 
+/* Common=shared styles */
+
+.common-button {
+    -fx-text-fill: white;
+    -fx-background-color: rgb(0, 150, 130);
+    -fx-background-radius: 0em;
+}
+
 /* Main window styles */
 
 .main-window {
@@ -54,11 +62,13 @@
     -fx-background-color: transparent;
 }
 
-.main-window .export-button {
+.main-window .export-button,
+.main-window .settings-button {
     -fx-background-color: transparent;
 }
 
-.main-window .export-button .jfx-rippler {
+.main-window .export-button .jfx-rippler,
+.main-window .settings-button .jfx-rippler {
     -jfx-rippler-fill: lightslategray;
 }
 
@@ -69,12 +79,6 @@
 .running-entry-container .description-text-input {
     -fx-text-fill: white;
     -fx-prompt-text-fill: lightgray;
-}
-
-.running-entry-container .start-stop-button {
-    -fx-text-fill: white;
-    -fx-background-color: rgb(0, 150, 130);
-    -fx-background-radius: 0em;
 }
 
 .days-list {
@@ -263,4 +267,10 @@
 
 .report-errors-container .report-error-label {
     -fx-text-fill: darkred;
+}
+
+/* Settings window */
+
+.settings-window {
+    -fx-background-color: white;
 }

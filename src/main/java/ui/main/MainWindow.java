@@ -16,25 +16,29 @@ import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import reports.ReportBuilder;
 import ui.reports.ReportErrorsWindow;
+import ui.settings.SettingsWindow;
 
 public class MainWindow {
-    private static int DEFAULT_DAYS_COUNT = 3;
+    private static int DEFAULT_DAYS_COUNT = 1;
 
     private RunningTimeEntryComponent runningTimeEntryComponent = this.initRunningEntryComponent();
     private DaysListComponent daysListComponent = new DaysListComponent();
 
+    private Image exportIcon = new Image(this.getClass().getResourceAsStream("/export.png"), 30, 30, true, true);
+    private Image settingsIcon = new Image(this.getClass().getResourceAsStream("/settings.png"), 30, 30, true, true);
+
     private Scene scene;
     private GridPane mainContainer = new GridPane();
     private JFXButton showMoreButton = new JFXButton("Show more");
-    private Image exportIcon = new Image(this.getClass().getResourceAsStream("/export.png"), 30, 30, true, true);
     private JFXButton exportButton = new JFXButton(null, new ImageView(exportIcon));
+    private JFXButton settingsButton = new JFXButton(null, new ImageView(settingsIcon));
 
     public MainWindow() {
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
@@ -49,7 +53,7 @@ public class MainWindow {
         showMoreButton.setOnAction((event) -> this.getMoreEntries(daysListComponent.getEarliestDate()));
         GridPane.setVgrow(showMoreButton, Priority.NEVER);
         GridPane.setHgrow(showMoreButton, Priority.ALWAYS);
-        GridPane.setHalignment(showMoreButton, HPos.LEFT);
+        GridPane.setHalignment(showMoreButton, HPos.CENTER);
 
         exportButton.getStyleClass().add("export-button");
         exportButton.setOnAction((event) -> {
@@ -62,17 +66,22 @@ public class MainWindow {
             }
         });
 
-        ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(40);
-        ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(60);
+        settingsButton.getStyleClass().add("settings-button");
+        settingsButton.setOnAction((event) -> {
+            Stage stage = new Stage();
+            stage.setTitle("Settings");
+            stage.setScene(SettingsWindow.create());
+            stage.setX(scene.getWindow().getX() + 50);
+            stage.setY(scene.getWindow().getY() + 50);
+            stage.show();
+        });
 
-        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 2, 1);
-        mainContainer.add(daysListComponent.getComponent(), 0, 1, 2, 1);
+        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 3, 1);
+        mainContainer.add(daysListComponent.getComponent(), 0, 1, 3, 1);
         mainContainer.add(exportButton, 0, 2);
         mainContainer.add(showMoreButton, 1, 2);
+        mainContainer.add(settingsButton, 2, 2);
         mainContainer.getStyleClass().add("main-window");
-        mainContainer.getColumnConstraints().addAll(column1, column2);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
         drawersStack.setContent(mainContainer);

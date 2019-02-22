@@ -95,7 +95,7 @@ public class RunningTimeEntryComponent implements IComponent {
     private JFXButton initStartButton() {
         startButton = new JFXButton();
         startButton.setText("Start");
-        startButton.getStyleClass().add("start-stop-button");
+        startButton.getStyleClass().add("common-button");
         startButton.setOnAction((event) -> {
             timeEntry = toggleClient.startTimeEntry();
             startTime = System.currentTimeMillis();
@@ -113,7 +113,7 @@ public class RunningTimeEntryComponent implements IComponent {
         stopButton = new JFXButton();
         stopButton.setText("Stop");
         stopButton.setVisible(false);
-        stopButton.getStyleClass().add("start-stop-button");
+        stopButton.getStyleClass().add("common-button");
         stopButton.setOnAction((event) -> {
             timer.stop();
             timeEntry.setDuration((int)((System.currentTimeMillis() - startTime) / 1000));
