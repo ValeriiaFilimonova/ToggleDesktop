@@ -274,3 +274,27 @@
 .settings-window {
     -fx-background-color: white;
 }
+
+.settings-window .config-name-label {
+    -fx-text-fill: lightslategray;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.settings-window .jfx-combo-box {
+    -jfx-focus-color: rgb(0, 150, 130);
+    -fx-pref-width: 100%;
+}
+
+.settings-window .jfx-combo-box .jfx-list-cell:focused {
+    -fx-background-color: rgb(0, 150, 130);
+}
+
+.settings-window .jfx-list-cell .jfx-rippler {
+    -jfx-rippler-fill: none;
+}
+
+.settings-window .project-cell {
+    -fx-background-color: white;
+}
+

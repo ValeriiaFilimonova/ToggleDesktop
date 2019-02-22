@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 public class Cache {
+    public static Project EMPTY_PROJECT = new Project("No project", "No project");
+
     private ToggleClient toggleClient = ToggleClient.getInstance();
 
     private Map<String, Project> projectsMap = new HashMap<>();

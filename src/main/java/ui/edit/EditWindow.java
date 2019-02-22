@@ -41,9 +41,9 @@ import org.languagetool.language.BritishEnglish;
 import org.languagetool.rules.RuleMatch;
 import ui.IComponent;
 
-public class EditWindow implements IComponent {
-    static Project EMPTY_PROJECT = new Project("No project", "No project");
+import static api.Cache.EMPTY_PROJECT;
 
+public class EditWindow implements IComponent {
     private static int GRID_GAP = 10;
     private static int ICON_SIZE = 15;
 

@@ -12,6 +12,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import lombok.Getter;
 
+import static api.Cache.EMPTY_PROJECT;
+
 class EditableTimeEntry {
     @Getter
     private boolean entryChanged = false;
@@ -56,7 +58,7 @@ class EditableTimeEntry {
             projectProperty.set(entry.getProject());
             companyProperty.set(entry.getProject().getCompanyName());
         } else {
-            projectProperty.set(EditWindow.EMPTY_PROJECT);
+            projectProperty.set(EMPTY_PROJECT);
         }
 
         if (entry.getStart() != null) {
@@ -105,7 +107,7 @@ class EditableTimeEntry {
         newEntry.setDuration((int) getDuration().getSeconds());
 
         Project project = projectProperty.get();
-        if (project.equals(EditWindow.EMPTY_PROJECT)) {
+        if (project.equals(EMPTY_PROJECT)) {
             newEntry.setPid(null);
         } else {
             newEntry.setPid(project.getId());

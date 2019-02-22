@@ -70,7 +70,7 @@ public class MainWindow {
         settingsButton.setOnAction((event) -> {
             Stage stage = new Stage();
             stage.setTitle("Settings");
-            stage.setScene(SettingsWindow.create());
+            stage.setScene(SettingsWindow.createScene());
             stage.setX(scene.getWindow().getX() + 50);
             stage.setY(scene.getWindow().getY() + 50);
             stage.show();
