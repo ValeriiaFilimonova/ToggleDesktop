@@ -298,3 +298,28 @@
     -fx-background-color: white;
 }
 
+.settings-window .chip-view-scroll-pane {
+    -fx-background: white;
+    -fx-padding: 5px;
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+}
+
+.settings-window .unfocused-scroll-pane {
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+}
+
+.settings-window .focused-scroll-pane {
+    -fx-border-color: rgb(0, 150, 130);
+    -fx-border-width: 2px;
+}
+
+.settings-window .jfx-chip-view {
+    -fx-background-color: white;
+    -fx-border-width: 0;
+}
+
+.settings-window .jfx-chip-view .jfx-chip > HBox {
+    -fx-background-radius: 10px;
+}
