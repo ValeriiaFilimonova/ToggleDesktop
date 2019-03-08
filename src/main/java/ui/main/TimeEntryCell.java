@@ -2,10 +2,10 @@ package ui.main;
 
 import java.io.InputStream;
 
-import api.Color;
-import api.Company;
-import api.Project;
-import api.TimeEntry;
+import api.toggle.Color;
+import api.toggle.Company;
+import api.toggle.Project;
+import api.toggle.TimeEntry;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;

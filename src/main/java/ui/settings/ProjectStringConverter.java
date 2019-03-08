@@ -1,6 +1,6 @@
 package ui.settings;
 
-import api.Project;
+import api.toggle.Project;
 import javafx.util.StringConverter;
 
 public class ProjectStringConverter extends StringConverter<Project> {

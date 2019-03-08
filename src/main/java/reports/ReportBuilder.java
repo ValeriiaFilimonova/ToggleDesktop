@@ -4,10 +4,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import api.Company;
-import api.Project;
-import api.TimeEntry;
-import api.ToggleClient;
+import api.toggle.Company;
+import api.toggle.Project;
+import api.toggle.TimeEntry;
+import api.toggle.ToggleClient;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

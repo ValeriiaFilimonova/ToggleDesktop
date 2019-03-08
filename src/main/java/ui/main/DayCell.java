@@ -6,7 +6,7 @@ import com.jfoenix.controls.JFXListCell;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import api.TimeEntry;
+import api.toggle.TimeEntry;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 import lombok.Setter;

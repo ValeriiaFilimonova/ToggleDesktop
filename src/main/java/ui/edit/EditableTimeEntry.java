@@ -3,16 +3,16 @@ package ui.edit;
 import java.time.*;
 import java.util.Date;
 
-import api.Project;
-import api.Tag;
-import api.TimeEntry;
+import api.toggle.Project;
+import api.toggle.Tag;
+import api.toggle.TimeEntry;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import lombok.Getter;
 
-import static api.Cache.EMPTY_PROJECT;
+import static api.toggle.Cache.EMPTY_PROJECT;
 
 class EditableTimeEntry {
     @Getter

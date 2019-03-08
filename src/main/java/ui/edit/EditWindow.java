@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import api.*;
+import api.toggle.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
@@ -41,7 +41,7 @@ import org.languagetool.language.BritishEnglish;
 import org.languagetool.rules.RuleMatch;
 import ui.IComponent;
 
-import static api.Cache.EMPTY_PROJECT;
+import static api.toggle.Cache.EMPTY_PROJECT;
 
 public class EditWindow implements IComponent {
     private static int GRID_GAP = 10;

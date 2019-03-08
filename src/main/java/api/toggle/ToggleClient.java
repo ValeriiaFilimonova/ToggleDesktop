@@ -1,4 +1,4 @@
-package api;
+package api.toggle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -24,7 +24,7 @@ import lombok.SneakyThrows;
 public class ToggleClient {
     public final static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
-    private final static String API_TOKEN = "80c1d6324f26fae2fb29646be7686cf1";
+    private final static String API_TOKEN = null;
 
     private final static String API_URL = "https://www.toggl.com/api/v8/";
     private final static String TIME_ENTRIES_PATH = "time_entries";

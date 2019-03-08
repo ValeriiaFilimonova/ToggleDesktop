@@ -1,6 +1,6 @@
 package reports;
 
-import api.TimeEntry;
+import api.toggle.TimeEntry;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package api;
+package api.toggle;
 
 import java.util.Collection;
 import java.util.HashMap;

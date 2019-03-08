@@ -1,4 +1,4 @@
-package api;
+package api.toggle;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

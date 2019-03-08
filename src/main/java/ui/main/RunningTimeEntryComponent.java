@@ -5,8 +5,8 @@ import com.jfoenix.controls.JFXTextField;
 
 import java.util.function.Consumer;
 
-import api.TimeEntry;
-import api.ToggleClient;
+import api.toggle.TimeEntry;
+import api.toggle.ToggleClient;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;

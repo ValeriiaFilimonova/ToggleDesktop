@@ -1,7 +1,7 @@
 package ui.settings;
 
-import api.Color;
-import api.Project;
+import api.toggle.Color;
+import api.toggle.Project;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;

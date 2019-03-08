@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import api.TimeEntry;
+import api.toggle.TimeEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import ui.IComponent;

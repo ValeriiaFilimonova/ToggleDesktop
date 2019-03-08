@@ -8,8 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import api.TimeEntry;
-import api.ToggleClient;
+import api.toggle.TimeEntry;
+import api.toggle.ToggleClient;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;

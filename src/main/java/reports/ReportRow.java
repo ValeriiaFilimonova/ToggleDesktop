@@ -3,9 +3,9 @@ package reports;
 import java.util.Date;
 import java.util.StringJoiner;
 
-import api.Company;
-import api.Project;
-import api.Tag;
+import api.toggle.Company;
+import api.toggle.Project;
+import api.toggle.Tag;
 import lombok.*;
 
 @Getter

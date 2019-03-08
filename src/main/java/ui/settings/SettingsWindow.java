@@ -5,8 +5,10 @@ import com.jfoenix.controls.JFXChipView;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 
-import api.Cache;
-import api.Project;
+import api.toggle.Cache;
+import api.toggle.Project;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -20,7 +22,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
-import static api.Cache.EMPTY_PROJECT;
+import static api.toggle.Cache.EMPTY_PROJECT;
 
 public class SettingsWindow {
     private static String UNFOCUSED_SCROLL_PANE_STYLE = "unfocused-scroll-pane";

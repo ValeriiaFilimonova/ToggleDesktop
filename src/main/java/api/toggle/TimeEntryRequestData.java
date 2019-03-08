@@ -1,4 +1,4 @@
-package api;
+package api.toggle;
 
 import lombok.Data;
 
