@@ -32,6 +32,7 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.0'
     compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.5'
     compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.9.0'
+    compile group: 'org.jasypt', name: 'jasypt', version: '1.9.2'
 }
 
 jar {

@@ -1,6 +1,7 @@
 package ui.main;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDrawersStack;
 
 import java.text.SimpleDateFormat;
@@ -10,14 +11,17 @@ import java.util.List;
 
 import api.toggle.TimeEntry;
 import api.toggle.ToggleClient;
+import api.toggle.ToggleClientException;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -28,19 +32,28 @@ import ui.settings.SettingsWindow;
 public class MainWindow {
     private static int DEFAULT_DAYS_COUNT = 1;
 
-    private RunningTimeEntryComponent runningTimeEntryComponent = this.initRunningEntryComponent();
+    private RunningTimeEntryComponent runningTimeEntryComponent;
     private DaysListComponent daysListComponent = new DaysListComponent();
 
     private Image exportIcon = new Image(this.getClass().getResourceAsStream("/export.png"), 30, 30, true, true);
     private Image settingsIcon = new Image(this.getClass().getResourceAsStream("/settings.png"), 30, 30, true, true);
 
     private Scene scene;
-    private GridPane mainContainer = new GridPane();
+    private StackPane mainContainer;
     private JFXButton showMoreButton = new JFXButton("Show more");
     private JFXButton exportButton = new JFXButton(null, new ImageView(exportIcon));
     private JFXButton settingsButton = new JFXButton(null, new ImageView(settingsIcon));
 
     public MainWindow() {
+        initialize();
+    }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    private void initialize() {
+        runningTimeEntryComponent = this.initRunningEntryComponent();
         runningTimeEntryComponent.setOnStopAction((entry) -> daysListComponent.addItem(entry));
         GridPane.setVgrow(runningTimeEntryComponent.getComponent(), Priority.NEVER);
         GridPane.setHgrow(runningTimeEntryComponent.getComponent(), Priority.ALWAYS);
@@ -76,12 +89,15 @@ public class MainWindow {
             stage.show();
         });
 
-        mainContainer.add(runningTimeEntryComponent.getComponent(), 0, 0, 3, 1);
-        mainContainer.add(daysListComponent.getComponent(), 0, 1, 3, 1);
-        mainContainer.add(exportButton, 0, 2);
-        mainContainer.add(showMoreButton, 1, 2);
-        mainContainer.add(settingsButton, 2, 2);
-        mainContainer.getStyleClass().add("main-window");
+        GridPane gridPane = new GridPane();
+        gridPane.add(runningTimeEntryComponent.getComponent(), 0, 0, 3, 1);
+        gridPane.add(daysListComponent.getComponent(), 0, 1, 3, 1);
+        gridPane.add(exportButton, 0, 2);
+        gridPane.add(showMoreButton, 1, 2);
+        gridPane.add(settingsButton, 2, 2);
+        gridPane.getStyleClass().add("main-window");
+
+        mainContainer = new StackPane(gridPane);
 
         JFXDrawersStack drawersStack = new JFXDrawersStack();
         drawersStack.setContent(mainContainer);
@@ -92,16 +108,17 @@ public class MainWindow {
         loadEntries();
     }
 
-    public Scene getScene() {
-        return scene;
-    }
+    private RunningTimeEntryComponent initRunningEntryComponent() throws ToggleClientException {
+        try {
+            ToggleClient toggleClient = ToggleClient.getInstance();
+            TimeEntry entry = toggleClient.getRunningTimeEntry();
 
-    private RunningTimeEntryComponent initRunningEntryComponent() {
-        ToggleClient toggleClient = ToggleClient.getInstance();
-        TimeEntry entry = toggleClient.getRunningTimeEntry();
-
-        if (entry != null && entry.getId() != null) {
-            return new RunningTimeEntryComponent(entry);
+            if (entry != null && entry.getId() != null) {
+                return new RunningTimeEntryComponent(entry);
+            }
+        } catch (ToggleClientException e) {
+            exportButton.setDisable(true);
+            showMoreButton.setDisable(true);
         }
         return new RunningTimeEntryComponent();
     }
@@ -114,6 +131,15 @@ public class MainWindow {
                 showMoreButton.setVisible(true);
             }
             daysListComponent.addItems(timeEntries);
+        });
+        service.setOnFailed(t -> {
+            if (t.getSource().getException() instanceof ToggleClientException) {
+                String labelText = "Please set Toggle API token in settings to start working with application";
+                Label label = new Label(labelText);
+
+                JFXDialog dialog = new JFXDialog(mainContainer, label, JFXDialog.DialogTransition.CENTER);
+                dialog.show();
+            }
         });
         service.start();
     }
@@ -141,7 +167,7 @@ public class MainWindow {
         protected Task<List<TimeEntry>> createTask() {
             return new Task<List<TimeEntry>>() {
                 @Override
-                protected List<TimeEntry> call() {
+                protected List<TimeEntry> call() throws ToggleClientException {
                     ToggleClient toggleClient = ToggleClient.getInstance();
                     return toggleClient.getTimeEntriesBeforeDate(date, count);
                 }

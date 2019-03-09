@@ -1,5 +1,9 @@
 /* JavaFx styles */
 
+.jfx-dialog .label {
+    -fx-padding: 10px;
+}
+
 .scroll-bar:horizontal .track,
 .scroll-bar:vertical .track {
     -fx-background-color: rgb(245, 245, 245);

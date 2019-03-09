@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
+import common.LocalSettingsStorage;
+import common.TokenEncryptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,7 +26,7 @@ import lombok.SneakyThrows;
 public class ToggleClient {
     public final static String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssXXX";
 
-    private final static String API_TOKEN = null;
+    private static String API_TOKEN = null;
 
     private final static String API_URL = "https://www.toggl.com/api/v8/";
     private final static String TIME_ENTRIES_PATH = "time_entries";
@@ -140,7 +142,17 @@ public class ToggleClient {
 
     private static ToggleClient toggleClientInstance = null;
 
-    public static ToggleClient getInstance() {
+    public static ToggleClient getInstance() throws ToggleClientException {
+        if (API_TOKEN == null) {
+            String localToken = LocalSettingsStorage.getInstance().get(LocalSettingsStorage.LocalSettings.TOGGLE_API_TOKEN);
+
+            if (localToken == null) {
+                throw new ToggleClientException("Error initiating ToggleClient: API token is empty");
+            }
+
+            API_TOKEN = TokenEncryptor.decrypt(localToken);
+        }
+
         if (toggleClientInstance == null) {
             ClientConfig clientConfig = new DefaultClientConfig(JacksonJsonProvider.class);
 

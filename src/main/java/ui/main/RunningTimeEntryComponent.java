@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import api.toggle.TimeEntry;
 import api.toggle.ToggleClient;
+import api.toggle.ToggleClientException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.SimpleStringProperty;
@@ -35,8 +36,6 @@ public class RunningTimeEntryComponent implements IComponent {
     private TimeEntry timeEntry;
 
     private Consumer<TimeEntry> stopClickListener;
-
-    private ToggleClient toggleClient = ToggleClient.getInstance();
 
     public RunningTimeEntryComponent() {
         entryDescription.bindBidirectional(entryTextBox.textProperty());
@@ -96,13 +95,19 @@ public class RunningTimeEntryComponent implements IComponent {
         startButton = new JFXButton();
         startButton.setText("Start");
         startButton.getStyleClass().add("common-button");
-        startButton.setOnAction((event) -> {
-            timeEntry = toggleClient.startTimeEntry();
-            startTime = System.currentTimeMillis();
-            timer.play();
-            startButton.setVisible(false);
-            stopButton.setVisible(true);
-        });
+
+        try {
+            ToggleClient toggleClient = ToggleClient.getInstance();
+            startButton.setOnAction((event) -> {
+                timeEntry = toggleClient.startTimeEntry();
+                startTime = System.currentTimeMillis();
+                timer.play();
+                startButton.setVisible(false);
+                stopButton.setVisible(true);
+            });
+        } catch (ToggleClientException e) {
+            startButton.setDisable(true);
+        }
 
         GridPane.setHgrow(startButton, Priority.NEVER);
 
@@ -114,21 +119,27 @@ public class RunningTimeEntryComponent implements IComponent {
         stopButton.setText("Stop");
         stopButton.setVisible(false);
         stopButton.getStyleClass().add("common-button");
-        stopButton.setOnAction((event) -> {
-            timer.stop();
-            timeEntry.setDuration((int)((System.currentTimeMillis() - startTime) / 1000));
-            timeEntry.setDescription(entryDescription.getValue());
-            timeEntry = toggleClient.updateTimeEntry(timeEntry);
-            startTime = 0;
-            entryTextBox.clear();
-            startButton.setVisible(true);
-            stopButton.setVisible(false);
-            timerLabel.setText(DEFAULT_TIMER_LABEL_TEXT);
 
-            if (stopClickListener != null) {
-                stopClickListener.accept(timeEntry);
-            }
-        });
+        try {
+            ToggleClient toggleClient = ToggleClient.getInstance();
+            stopButton.setOnAction((event) -> {
+                timer.stop();
+                timeEntry.setDuration((int) ((System.currentTimeMillis() - startTime) / 1000));
+                timeEntry.setDescription(entryDescription.getValue());
+                timeEntry = toggleClient.updateTimeEntry(timeEntry);
+                startTime = 0;
+                entryTextBox.clear();
+                startButton.setVisible(true);
+                stopButton.setVisible(false);
+                timerLabel.setText(DEFAULT_TIMER_LABEL_TEXT);
+
+                if (stopClickListener != null) {
+                    stopClickListener.accept(timeEntry);
+                }
+            });
+        } catch (ToggleClientException e) {
+            stopButton.setDisable(true);
+        }
 
         GridPane.setHgrow(stopButton, Priority.NEVER);
 
