@@ -32,14 +32,17 @@ public class SettingsWindow {
     private Scene scene;
     private GridPane mainContainer = new GridPane();
 
-    private JFXTextField apiTokenInput = this.initApiTokenInput();
-    private JFXComboBox<Project> projectSelectInput = this.initProjectSelectInput();
+    private SimpleStringProperty apiTokenProperty = new SimpleStringProperty();
+
+    private SimpleObjectProperty<Project> defaultProjectProperty = new SimpleObjectProperty<>();
+
     private ScrollPane scrollableIgnoreListInput = this.initSpellIgnoreListInput();
     private JFXButton saveButton = new JFXButton("Save");
 
     private SettingsWindow() {
         saveButton.getStyleClass().add("common-button");
         saveButton.setDisable(true);
+
         GridPane.setHalignment(saveButton, HPos.RIGHT);
         GridPane.setValignment(saveButton, VPos.BOTTOM);
         GridPane.setVgrow(saveButton, Priority.ALWAYS);
@@ -48,9 +51,9 @@ public class SettingsWindow {
         int row = 0;
 
         mainContainer.add(createLabel("Toggle API token:"), 0, row++);
-        mainContainer.add(apiTokenInput, 0, row++);
+        mainContainer.add(this.initApiTokenInput(), 0, row++);
         mainContainer.add(createLabel("Default project:"), 0, row++);
-        mainContainer.add(projectSelectInput, 0, row++);
+        mainContainer.add(this.initProjectSelectInput(), 0, row++);
         mainContainer.add(createLabel("Spell check ignore list:"), 0, row++);
         mainContainer.add(scrollableIgnoreListInput, 0, row++);
         mainContainer.add(saveButton, 0, row);
@@ -77,6 +80,9 @@ public class SettingsWindow {
     private JFXTextField initApiTokenInput() {
         JFXTextField apiTokenInput = new JFXTextField();
 
+        apiTokenProperty.addListener((observable, oldValue, newValue) -> saveButton.setDisable(false));
+
+        apiTokenInput.textProperty().bindBidirectional(apiTokenProperty);
         apiTokenInput.setFocusColor(Color.rgb(0, 150, 130, 1));
         apiTokenInput.setFocusTraversable(false);
         apiTokenInput.focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -100,6 +106,9 @@ public class SettingsWindow {
             projectSelectInput.setDisable(true);
         }
 
+        defaultProjectProperty.addListener((observable, oldValue, newValue) -> saveButton.setDisable(false));
+
+        projectSelectInput.valueProperty().bindBidirectional(defaultProjectProperty);
         projectSelectInput.setItems(projects);
         projectSelectInput.setFocusTraversable(false);
         projectSelectInput.setConverter(new ProjectStringConverter());

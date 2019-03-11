@@ -16,11 +16,15 @@ import java.util.Date;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 
+import api.storage.KeyValueStorage;
+import api.storage.kvaas.KVaaSStorage;
 import common.LocalSettingsStorage;
 import common.TokenEncryptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+
+import static common.LocalSettingsStorage.*;
 
 @RequiredArgsConstructor
 public class ToggleClient {
@@ -143,14 +147,22 @@ public class ToggleClient {
     private static ToggleClient toggleClientInstance = null;
 
     public static ToggleClient getInstance() throws ToggleClientException {
+        KeyValueStorage keyValueStorage = new KVaaSStorage();
+
         if (API_TOKEN == null) {
-            String localToken = LocalSettingsStorage.getInstance().get(LocalSettingsStorage.LocalSettings.TOGGLE_API_TOKEN);
+            String localToken = LocalSettingsStorage.getInstance().get(LocalSettings.TOGGLE_API_TOKEN);
 
             if (localToken == null) {
-                throw new ToggleClientException("Error initiating ToggleClient: API token is empty");
-            }
+                String remoteToken = keyValueStorage.getToggleApiToken();
 
-            API_TOKEN = TokenEncryptor.decrypt(localToken);
+                if (remoteToken == null) {
+                    throw new ToggleClientException("Error initiating ToggleClient: API token is empty");
+                }
+
+                API_TOKEN = TokenEncryptor.decrypt(remoteToken);
+            } else {
+                API_TOKEN = TokenEncryptor.decrypt(localToken);
+            }
         }
 
         if (toggleClientInstance == null) {
