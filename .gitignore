@@ -1,2 +1,6 @@
 .idea
+.gradle
+build
 gradle
+javafx-sdk-11.0.2
+out

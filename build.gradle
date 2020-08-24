@@ -1,15 +1,18 @@
-group 'com'
-version '1.0'
-
 buildscript {
-    dependencies {
-        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
-    }
     repositories {
         mavenLocal()
         mavenCentral()
-
     }
+}
+
+plugins {
+    id "application"
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+}
+
+javafx {
+    version = "13"
+    modules = ['javafx.controls', 'javafx.base', 'javafx.swing', 'javafx.graphics']
 }
 
 repositories {
@@ -17,12 +20,12 @@ repositories {
 }
 
 apply plugin: 'java'
-apply plugin: 'javafx-gradle-plugin'
 
 dependencies {
-    compileOnly "org.projectlombok:lombok:1.16.8"
+    compile("org.projectlombok:lombok:1.18.4")
+    annotationProcessor("org.projectlombok:lombok:1.18.4")
 
-    compile 'com.jfoenix:jfoenix:8.0.3'
+    compile 'com.jfoenix:jfoenix:9.0.9'
     compile 'org.languagetool:language-en:4.1'
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.8.2'
     compile group: 'joda-time', name: 'joda-time', version: '2.3'
@@ -43,3 +46,5 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
+
+mainClassName = "ui.ToggleDesktopApplication"

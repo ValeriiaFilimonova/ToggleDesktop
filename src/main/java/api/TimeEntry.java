@@ -50,6 +50,7 @@ public class TimeEntry implements Comparable<TimeEntry>, Cloneable {
     private String created_with;
 
     @JsonIgnore
+    @Builder.Default
     private Boolean hasSpellingErrors = null;
 
     public String getDescription() {

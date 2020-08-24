@@ -50,7 +50,7 @@ public class ToggleClient {
         WebResource resource = jerseyClient.resource(API_URL + WORKSPACES_PATH + "1580497/projects"); // TODO
         ClientResponse response = resource.accept(MediaType.APPLICATION_JSON_TYPE).get(ClientResponse.class);
 
-        return validateResponse(response).getEntity(new GenericType<List<Project>>() {});
+        return validateResponse(response).getEntity(new GenericType<>() {});
     }
 
     public Project getProjectById(String projectId) {
@@ -103,7 +103,7 @@ public class ToggleClient {
         ZoneId zone = ZoneId.systemDefault();
         Instant endDateInstant = endDate.toInstant();
         LocalDate endLocalDate = endDateInstant.atZone(zone).toLocalDate();
-        ZonedDateTime startDateTime = ZonedDateTime.of(endLocalDate, LocalTime.MIN, zone).minusDays(days);
+        ZonedDateTime startDateTime = ZonedDateTime.of(endLocalDate, LocalTime.MIN, zone).minusMonths(8).minusDays(days);
         ZonedDateTime endDateTime = ZonedDateTime.ofInstant(endDateInstant, zone);
 
         WebResource resource = jerseyClient
@@ -114,12 +114,12 @@ public class ToggleClient {
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .get(ClientResponse.class);
 
-        return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
+        return validateResponse(response).getEntity(new GenericType<>() {});
     }
 
     public List<TimeEntry> getTimeEntriesForMonth() {
         LocalDate localDate = LocalDate.now().withDayOfMonth(1);
-        ZonedDateTime dateTime = ZonedDateTime.of(localDate, LocalTime.MIN, ZoneId.systemDefault());
+        ZonedDateTime dateTime = ZonedDateTime.of(localDate, LocalTime.MIN, ZoneId.systemDefault()).minusMonths(8);
 
         WebResource resource = jerseyClient
             .resource(API_URL + TIME_ENTRIES_PATH)
@@ -127,7 +127,7 @@ public class ToggleClient {
         ClientResponse response = resource
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .get(ClientResponse.class);
-        return validateResponse(response).getEntity(new GenericType<List<TimeEntry>>() {});
+        return validateResponse(response).getEntity(new GenericType<>() {});
     }
 
     private ClientResponse validateResponse(ClientResponse response) {
